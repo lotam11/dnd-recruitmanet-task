@@ -4,7 +4,7 @@ dotenv.config()
 
 export namespace Database {
   export const host = process.env.MYSQL_HOST;
-  export const port = process.env.MYSQL_PORT;
+  export const port = parseInt(process.env.MYSQL_PORT as string);
   export const database = process.env.MYSQL_DB;
   export const user = process.env.MYSQL_USER;
   export const password = process.env.MYSQL_PASSWORD

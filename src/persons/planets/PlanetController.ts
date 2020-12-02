@@ -1,33 +1,33 @@
-import {Data, GetListInput, PersonStarship} from './StarshipData';
-import * as StarshipData from './StarshipData';
+import {Data, GetListInput, PersonPlanet} from './PlanetData';
+import * as PlanetData from './PlanetData';
 
 import {DataClient} from '../../data/DataProvider'
 
 export interface Controller {
-  get: ReturnType<typeof getStarship>,
-  getList: ReturnType<typeof getStarshipList>,
-  create: ReturnType<typeof createStarship>,
+  get: ReturnType<typeof getPlanet>,
+  getList: ReturnType<typeof getPlanetList>,
+  create: ReturnType<typeof createPlanet>,
 }
 
-export const getStarship = (starships: Data) => async (input: string) => {
-  return starships.get(input)
+export const getPlanet = (planets: Data) => async (input: string) => {
+  return planets.get(input)
 }
 
-export const getStarshipList = (starships: Data) => async (input?: GetListInput) => {
-  return starships.getList(input)
+export const getPlanetList = (planets: Data) => async (input?: GetListInput) => {
+  return planets.getList(input)
 }
 
-export const createStarship = (starships: Data) => async (input?: PersonStarship) => {
-  return starships.create(input)
+export const createPlanet = (planets: Data) => async (input?: PersonPlanet) => {
+  return planets.create(input)
 }
 
 export async function create (data: DataClient): Promise<Controller> {
-  const Starships = await StarshipData.create(data)
+  const Planets = await PlanetData.create(data)
 
   return {
-    get: getStarship(Starships),
-    getList: getStarshipList(Starships),
-    create: createStarship(Starships),
+    get: getPlanet(Planets),
+    getList: getPlanetList(Planets),
+    create: createPlanet(Planets),
   }
 }
 

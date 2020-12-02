@@ -10,11 +10,11 @@ export async function create () {
   const knex = Knex({
     client: 'mysql',
     connection: {
-      user: Database.username,
+      user: Database.user,
       password: Database.password,
-      host: Database.hostname,
+      host: Database.host,
       port: Database.port,
-      database: Database.name
+      database: Database.database
     },
   })
 

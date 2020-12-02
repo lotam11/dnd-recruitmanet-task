@@ -1,20 +1,14 @@
-import {Context} from 'koa'
+import {Request} from 'express'
 
-import {DataClient} from '../data'
+import {DataClient} from '../data/DataProvider'
 import PersonController, {Controller} from './PersonController'
 
 export const getCurrentPerson = (persons: Controller) => async (req: Request) => {
-  const id = req.session && req.session.personId
-
-  return id && persons.get({id})
+  return persons.get(req.body.id)
 }
 
 export const createPerson = (persons: Controller) => async (req: Request) => {
   const person = await persons.create()
-
-  if (!req.session) req.session = {}
-  req.session.personId = person.id
-
   return person
 }
 

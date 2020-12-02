@@ -1,6 +1,6 @@
 import Knex from 'knex'
 
-import MysqlProvider from './MysqlProvider'
+import * as MysqlProvider from './MysqlProvider'
 
 export interface DataClient {
   mysql: Knex,

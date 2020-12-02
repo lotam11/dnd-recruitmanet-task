@@ -1,41 +1,36 @@
 import bodyParser from 'body-parser'
 import chalk from 'chalk'
-import * as express from 'express';
+import express from 'express';
 import {Express} from 'express'
 import http from 'http'
 import morgan from 'morgan'
-import cookieSession from 'cookie-session'
 
-import UserHandlers from './persons/PersonHandlers'
-import {DataProvider} from './data'
+import PersonHandler from './persons/PersonHandler'
+import DataProvider, { DataClient } from './data/DataProvider'
 import {promise} from './Middleware'
 import {Server} from './Config'
-import {SessionData} from './Types'
 
-declare module 'express' {
-  interface Request {
-    session?: SessionData,
-  }
-}
+const createHandlers = async (data: DataClient) => ({
+  personHandler: (await PersonHandler.create(data))
+});
 
 export async function create () {
   const app = express()
   const data = await DataProvider.create()
-
+  const handlers = await createHandlers(data)
   app
     .disable('x-powered-by')
     .use(morgan(Server.isDev ? 'dev' : 'combined'))
     .use(bodyParser.json())
-    .use(cookieSession({
-      name: 'session',
-      keys: ['pkdsM?o36UPYjuNx', 'QnwWwTnNiGd2M3>o', 'ikmUPhQcD78QTN;i'],
+    // .use(cookieSession({
+    //   name: 'session',
+    //   keys: ['pkdsM?o36UPYjuNx', 'QnwWwTnNiGd2M3>o', 'ikmUPhQcD78QTN;i'],
 
-      // Cookie Options
-      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-    }))
+    //   // Cookie Options
+    //   maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    // }))
 
-    .post('/users/create', promise(async req => (await UserHandlers.create(data)).create(req)))
-    .get('/user/current', promise(async req => (await UserHandlers.create(data)).getCurrent(req)))
+    .post('/users/create', promise(async req => await handlers.personHandler.create(req) ));
 
   return app
 }

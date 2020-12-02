@@ -2,6 +2,7 @@ import {QueryBuilder} from 'knex';
 import {DataClient} from '../data/DataProvider';
 
 export interface Person {
+  id: number,
   nickname: string,
   fullname?: string,
   description?: string
