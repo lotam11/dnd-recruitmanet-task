@@ -1,0 +1,23 @@
+{
+  "name": "recruitment-dnd",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "main.js",
+  "license": "MIT",
+  "dependencies": {
+    "@koa/router": "^10.0.0",
+    "@types/express": "^4.17.9",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "knex": "^0.21.12",
+    "knex-migrate": "^1.7.4",
+    "koa": "^2.13.0",
+    "koa-router": "^10.0.0",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "sqlite3": "^5.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.1.2"
+  }
+}
