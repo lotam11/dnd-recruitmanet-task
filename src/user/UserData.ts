@@ -12,6 +12,11 @@ export interface UserInput {
   hash: string
 }
 
+export interface Data {
+  getHash: ReturnType<typeof getHash>,
+  create: ReturnType<typeof createUser>
+}
+
 export const getHash = (users: () => QueryBuilder) => 
   async (identifier: string) => {
     return (await users().select().where({identifier})).hash as string
@@ -19,11 +24,6 @@ export const getHash = (users: () => QueryBuilder) =>
 
 export const createUser = (users: () => QueryBuilder) => async (input?: UserInput) => {
   await users().insert(input);
-}
-
-export interface Data {
-  getHash: ReturnType<typeof getHash>,
-  create: ReturnType<typeof createUser>
 }
 
 export async function create (data: DataClient): Promise<Data> {
