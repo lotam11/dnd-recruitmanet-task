@@ -1,23 +1,24 @@
-import {Request} from 'express'
+import {request, Request} from 'express'
 
 import {DataClient} from '../data/DataProvider'
-import PersonController, {Controller} from './PersonController'
+import UserController, {Controller} from './UserController'
 
-export const getCurrentPerson = (persons: Controller) => async (req: Request) => {
-  return persons.get(req.body.id)
+export const authenticate = (users: Controller, secretKey: string) => async (req: Request) => {
+  const {identifier, password} = req.body;
+  return users.authenticate( {identifier, password} )
 }
 
-export const createPerson = (persons: Controller) => async (req: Request) => {
-  const person = await persons.create()
-  return person
+export const createUser = (users: Controller) => async (req: Request) => {
+  const user = await users.create(req.body)
+  return user
 }
 
-export async function create (data: DataClient) {
-  const persons = await PersonController.create(data)
+export async function create (data: DataClient, secretKey: string) {
+  const users = await UserController.create(data, secretKey)
 
   return {
-    getCurrent: getCurrentPerson(persons),
-    create: createPerson(persons),
+    create: createUser(users),
+    authenticate: authenticate(users, secretKey)
   }
 }
 

@@ -20,6 +20,7 @@ var Server;
     Server.bodyLimit = '100kb';
     Server.corsHeaders = ['Link'];
     Server.isDev = process.env.NODE_ENV === 'development';
+    Server.jwtSecret = process.env.JWT_SECRET_KEY;
 })(Server = exports.Server || (exports.Server = {}));
 var Knex;
 (function (Knex) {

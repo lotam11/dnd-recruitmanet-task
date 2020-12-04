@@ -17,15 +17,17 @@ export async function create () {
   const app = express();
   const data = await DataProvider.create();
   const handlers = await Handlers.create(data);
-  const router = await createRouter(handlers);
+  const appRouter = await createRouter(handlers);
   
   app
     .disable('x-powered-by')
     .use(morgan(Server.isDev ? 'dev' : 'combined'))
     .use(bodyParser.json())
     .use(
-      router.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
-    );
+      appRouter.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
+    )
+    .post("/authenticate", promise(async (request) => {handlers.userHandler.authenticate(request)}))
+    ;
 
   return app;
 }

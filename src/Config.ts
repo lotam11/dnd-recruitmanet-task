@@ -16,6 +16,7 @@ export namespace Server {
   export const bodyLimit = '100kb'
   export const corsHeaders = ['Link']
   export const isDev = process.env.NODE_ENV === 'development'
+  export const jwtSecret = process.env.JWT_SECRET_KEY
 }
 
 export namespace Knex {

@@ -39,6 +39,7 @@ const http_1 = __importDefault(require("http"));
 const morgan_1 = __importDefault(require("morgan"));
 const express_jwt_1 = __importDefault(require("express-jwt"));
 const DataProvider_1 = __importDefault(require("./data/DataProvider"));
+const Middleware_1 = require("./Middleware");
 const Config_1 = require("./Config");
 const Handlers = __importStar(require("./Handlers"));
 const Routes_1 = require("./Routes");
@@ -47,12 +48,13 @@ function create() {
         const app = express_1.default();
         const data = yield DataProvider_1.default.create();
         const handlers = yield Handlers.create(data);
-        const router = yield Routes_1.createRouter(handlers);
+        const appRouter = yield Routes_1.createRouter(handlers);
         app
             .disable('x-powered-by')
             .use(morgan_1.default(Config_1.Server.isDev ? 'dev' : 'combined'))
             .use(body_parser_1.default.json())
-            .use(router.use(express_jwt_1.default({ secret: process.env.JWT_SECRET_KEY, algorithms: ['HS256'] })));
+            .use(appRouter.use(express_jwt_1.default({ secret: process.env.JWT_SECRET_KEY, algorithms: ['HS256'] })))
+            .post("/authenticate", Middleware_1.promise((request) => __awaiter(this, void 0, void 0, function* () { handlers.userHandler.authenticate(request); })));
         return app;
     });
 }

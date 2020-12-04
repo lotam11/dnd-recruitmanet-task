@@ -1,23 +1,23 @@
 import {Request} from 'express'
 
 import {DataClient} from '../../data/DataProvider'
-import PersonController, {Controller} from './PersonController'
+import StarshipController, {Controller} from './StarshipController'
 
-export const getCurrentPerson = (persons: Controller) => async (req: Request) => {
-  return persons.get(req.body.id)
+export const getCurrentStarship = (starships: Controller) => async (req: Request) => {
+  return starships.get(req.body.id)
 }
 
-export const createPerson = (persons: Controller) => async (req: Request) => {
-  const person = await persons.create()
-  return person
+export const createStarship = (starships: Controller) => async (req: Request) => {
+  const starship = await starships.create()
+  return starship
 }
 
 export async function create (data: DataClient) {
-  const persons = await PersonController.create(data)
+  const starships = await StarshipController.create(data)
 
   return {
-    getCurrent: getCurrentPerson(persons),
-    create: createPerson(persons),
+    getCurrent: getCurrentStarship(starships),
+    create: createStarship(starships),
   }
 }
 
