@@ -22,13 +22,17 @@ export const promise = (middleware: PromiseMiddleware) => (
 export const handleValidatorErrors = (err: any, req: Request, res: Response, next: NextFunction) => {
   if (!err) {
     return next();
-}
-
-  console.log("!!!ERROR!!!", typeof(err));
-  if(err instanceof ValidationError){
-    console.log("!!!VALIDATIION!!!");
-
-    res.status(400).json({ error: err.details,});
   }
+
+  if(err instanceof ValidationError){
+    res.status(400).json({ error: err.details,});
+  } else
+    throw err;
 }
 export default {promise}
+
+export const asyncHandler = (fn: PromiseMiddleware) => 
+  async (req: Request, res: Response, next: NextFunction) => { 
+  return next(await fn(req, res).catch(next));
+}
+  

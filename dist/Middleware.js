@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleValidatorErrors = exports.promise = void 0;
+exports.asyncHandler = exports.handleValidatorErrors = exports.promise = void 0;
 const joi_1 = require("joi");
 const promise = (middleware) => ((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -30,11 +30,15 @@ const handleValidatorErrors = (err, req, res, next) => {
     if (!err) {
         return next();
     }
-    console.log("!!!ERROR!!!", typeof (err));
     if (err instanceof joi_1.ValidationError) {
-        console.log("!!!VALIDATIION!!!");
         res.status(400).json({ error: err.details, });
     }
+    else
+        throw err;
 };
 exports.handleValidatorErrors = handleValidatorErrors;
 exports.default = { promise: exports.promise };
+const asyncHandler = (fn) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    return next(yield fn(req, res).catch(next));
+});
+exports.asyncHandler = asyncHandler;

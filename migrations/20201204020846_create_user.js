@@ -1,10 +1,10 @@
 
 export const up =  function(knex) {
   return knex.schema
-    .createTable("user", function (table) {
+    .createTable("users", function (table) {
       table.increments(); // integer id
       table.string('identifier');
-      table.string('password');
+      table.string('hash');
     })
 };
 

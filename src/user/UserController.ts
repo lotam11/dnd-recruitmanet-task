@@ -1,50 +1,59 @@
-import {Data, UserInput, User} from './UserData';
-import * as UserData from './UserData';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import {request, Request, response, Response} from 'express'
+import joi from 'joi';
+
 import {DataClient} from '../data/DataProvider'
+import { IAuthService } from './auth';
+import UserController, {Service} from './UserService'
 
-export interface Controller {
-  authenticate: ReturnType<typeof authenticate>,
-  create: ReturnType<typeof createUser>,
-}
-interface AuthenticationInput {
-  identifier: string,
-  password: string
-}
+export const authenticate = (
+  users: Service,
+  authService: IAuthService
+) => {
+  const validation = joi.object().keys({ 
+    identifier: joi.string().required(),
+    password: joi.string().required() 
+  });
 
-export const authenticate = (users: Data, secretKey: string) => 
-    async (input: AuthenticationInput) => {
-      const hash = await users.getHash(input.identifier);
-      const isAuthenticated = bcrypt.compareSync(
-        input.password,
-        hash
-      )
+  return async (req: Request, res: Response) => {
+    joi.attempt(req.body, validation);
 
-      if (isAuthenticated) {
-        return jwt.sign({identifier: input.identifier}, secretKey,{expiresIn: 300});
-      }
+    const {identifier, password} = req.body;
+
+    const hash = await users.getHash(identifier);
+
+    if (hash == undefined || hash === "" ){
+      res.status(404);
+      return;
     }
 
-export const createUser = (users: Data) => 
-  async (input: AuthenticationInput) => {
-    const hash = bcrypt.hashSync(input.password, 10)
-
-    return users.create({
-      identifier: input?.identifier,
-      hash
-    })
+    if( authService.authenticate(hash, password))
+      res.json({
+        token: authService.getKey({identifier})
+      })
+    else
+      res.status(403)
   }
+}
 
-export async function create (
-  data: DataClient,
-  secretKey: string
-): Promise<Controller> {
-  const users = await UserData.create(data)
+export const register = (users: Service) => {
+  const validation = joi.object().keys({ 
+    identifier: joi.string().required(),
+    password: joi.string().required() 
+  });
+
+  return async (req: Request, res: Response) => {
+    joi.attempt(req.body, validation);
+    const user = await users.create(req.body);
+    response.status(200);
+  }
+}
+
+export async function create (data: DataClient, authService: IAuthService) {
+  const users = await UserController.create(data)
 
   return {
-    authenticate: authenticate(users, secretKey),
-    create: createUser(users),
+    register: register(users),
+    authenticate: authenticate(users, authService)
   }
 }
 

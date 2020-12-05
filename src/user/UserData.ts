@@ -27,7 +27,7 @@ export const createUser = (users: () => QueryBuilder) => async (input?: UserInpu
 }
 
 export async function create (data: DataClient): Promise<Data> {
-  const users = () => data.mysql.table('User')
+  const users = () => data.mysql.table('users')
 
   return {
     getHash: getHash(users),

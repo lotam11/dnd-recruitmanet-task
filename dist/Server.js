@@ -37,31 +37,31 @@ const chalk_1 = __importDefault(require("chalk"));
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const morgan_1 = __importDefault(require("morgan"));
-const express_jwt_1 = __importDefault(require("express-jwt"));
 const DataProvider_1 = __importDefault(require("./data/DataProvider"));
 const Middleware_1 = require("./Middleware");
 const Config_1 = require("./Config");
 const Handlers = __importStar(require("./Handlers"));
 const Routes_1 = require("./Routes");
-function wrapAsync(fn) {
-    return function (req, res, next) {
-        // Make sure to `.catch()` any errors and pass them along to the `next()`
-        // middleware in the chain, in this case the error handler.
-        fn(req, res, next).catch(next);
-    };
-}
+const JwtAuth = __importStar(require("./user/auth/JWTAuthService"));
 function create() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = express_1.default();
         const data = yield DataProvider_1.default.create();
-        const handlers = yield Handlers.create(data);
+        const authService = yield JwtAuth.create({
+            secretkey: Config_1.Server.jwtSecret,
+            expiresIn: 400
+        });
+        const handlers = yield Handlers.create(data, authService);
         const appRouter = yield Routes_1.createRouter(handlers);
         app
             .disable('x-powered-by')
             .use(morgan_1.default(Config_1.Server.isDev ? 'dev' : 'combined'))
             .use(body_parser_1.default.json())
-            .post("/authorize", wrapAsync(handlers.userHandler.authenticate))
-            .use(appRouter.use(express_jwt_1.default({ secret: process.env.JWT_SECRET_KEY, algorithms: ['HS256'] })));
+            .post("/authorize", Middleware_1.promise(handlers.userHandler.authenticate))
+            .post("/register", Middleware_1.promise(handlers.userHandler.register));
+        // .use(
+        //   appRouter.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
+        // );
         app.use(Middleware_1.handleValidatorErrors);
         return app;
     });

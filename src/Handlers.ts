@@ -3,16 +3,20 @@ import PersonHandler from "./persons/PersonHandler";
 import FilmsHandler from "./persons/films/FilmsHandler";
 import StarshipHandler from "./persons/starships/StarshipHandler";
 import VehiculeHandler from "./persons/vehicule/VehiculeHandler";
-import UserHandler from "./user/UserHandler"
+import UserHandler from "./user/UserController"
 import { Server } from "./Config";
+import { IAuthService } from "./user/auth";
 
-export async function create (data: DataClient){
+export async function create (
+  data: DataClient,
+  auth: IAuthService
+){
   return {
     personHandler: (await PersonHandler.create(data)),
     filmsHandler: (await FilmsHandler.create(data)),
     starshipHandler: (await StarshipHandler.create(data)),
     vehiculeHandler: (await VehiculeHandler.create(data)),
-    userHandler: (await UserHandler.create(data, Server.jwtSecret as string)),
+    userHandler: (await UserHandler.create(data, auth)),
   }
 };
 
