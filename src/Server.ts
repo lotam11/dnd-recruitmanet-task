@@ -8,10 +8,18 @@ import jwt from 'express-jwt'
 
 import PersonHandler from './persons/PersonHandler'
 import DataProvider, { DataClient } from './data/DataProvider'
-import {promise} from './Middleware'
+import {handleValidatorErrors, promise} from './Middleware'
 import {Server} from './Config'
 import * as Handlers from './Handlers'
 import { createRouter } from './Routes';
+
+function wrapAsync(fn: any) {
+  return function(req: any, res: any, next: any) {
+    // Make sure to `.catch()` any errors and pass them along to the `next()`
+    // middleware in the chain, in this case the error handler.
+    fn(req, res, next).catch(next);
+  };
+}
 
 export async function create () {
   const app = express();
@@ -23,12 +31,11 @@ export async function create () {
     .disable('x-powered-by')
     .use(morgan(Server.isDev ? 'dev' : 'combined'))
     .use(bodyParser.json())
+    .post("/authorize", wrapAsync(handlers.userHandler.authenticate))
     .use(
       appRouter.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
-    )
-    .post("/authenticate", promise(async (request) => {handlers.userHandler.authenticate(request)}))
-    ;
-
+    );
+  app.use(handleValidatorErrors);
   return app;
 }
 
@@ -40,7 +47,6 @@ export async function main () {
   server.listen(Server.port, (err?: Error) => {
     if (err) {
       console.error(err)
-
       return
     }
     console.log(chalk.cyan(`> Started API on port ${chalk.yellow(Server.port.toString())}`))
@@ -56,4 +62,6 @@ export async function main () {
   return replaceApp
 }
 
-export default {create, main}
+export default {create, main};
+
+main () 

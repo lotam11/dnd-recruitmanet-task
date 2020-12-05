@@ -13,26 +13,28 @@ interface AuthenticationInput {
   password: string
 }
 
-export const authenticate = (users: Data, secretKey: string) => async (input: AuthenticationInput) => {
-  const hash = await users.getHash(input.identifier);
-  const isAuthenticated = bcrypt.compareSync(
-    input.password,
-    hash
-  )
+export const authenticate = (users: Data, secretKey: string) => 
+    async (input: AuthenticationInput) => {
+      const hash = await users.getHash(input.identifier);
+      const isAuthenticated = bcrypt.compareSync(
+        input.password,
+        hash
+      )
 
-  if (isAuthenticated) {
-    jwt.sign({identifier: input.identifier}, secretKey,{expiresIn: 300});
+      if (isAuthenticated) {
+        return jwt.sign({identifier: input.identifier}, secretKey,{expiresIn: 300});
+      }
+    }
+
+export const createUser = (users: Data) => 
+  async (input: AuthenticationInput) => {
+    const hash = bcrypt.hashSync(input.password, 10)
+
+    return users.create({
+      identifier: input?.identifier,
+      hash
+    })
   }
-}
-
-export const createUser = (users: Data) => async (input: AuthenticationInput) => {
-  const hash = bcrypt.hashSync(input.password, 10)
-
-  return users.create({
-    identifier: input?.identifier,
-    hash
-  })
-}
 
 export async function create (
   data: DataClient,

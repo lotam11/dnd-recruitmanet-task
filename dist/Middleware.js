@@ -9,7 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.promise = void 0;
+exports.handleValidatorErrors = exports.promise = void 0;
+const joi_1 = require("joi");
 const promise = (middleware) => ((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield middleware(req, res);
@@ -25,4 +26,15 @@ const promise = (middleware) => ((req, res, next) => __awaiter(void 0, void 0, v
     }
 }));
 exports.promise = promise;
+const handleValidatorErrors = (err, req, res, next) => {
+    if (!err) {
+        return next();
+    }
+    console.log("!!!ERROR!!!", typeof (err));
+    if (err instanceof joi_1.ValidationError) {
+        console.log("!!!VALIDATIION!!!");
+        res.status(400).json({ error: err.details, });
+    }
+};
+exports.handleValidatorErrors = handleValidatorErrors;
 exports.default = { promise: exports.promise };

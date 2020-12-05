@@ -43,6 +43,13 @@ const Middleware_1 = require("./Middleware");
 const Config_1 = require("./Config");
 const Handlers = __importStar(require("./Handlers"));
 const Routes_1 = require("./Routes");
+function wrapAsync(fn) {
+    return function (req, res, next) {
+        // Make sure to `.catch()` any errors and pass them along to the `next()`
+        // middleware in the chain, in this case the error handler.
+        fn(req, res, next).catch(next);
+    };
+}
 function create() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = express_1.default();
@@ -53,8 +60,9 @@ function create() {
             .disable('x-powered-by')
             .use(morgan_1.default(Config_1.Server.isDev ? 'dev' : 'combined'))
             .use(body_parser_1.default.json())
-            .use(appRouter.use(express_jwt_1.default({ secret: process.env.JWT_SECRET_KEY, algorithms: ['HS256'] })))
-            .post("/authenticate", Middleware_1.promise((request) => __awaiter(this, void 0, void 0, function* () { handlers.userHandler.authenticate(request); })));
+            .post("/authorize", wrapAsync(handlers.userHandler.authenticate))
+            .use(appRouter.use(express_jwt_1.default({ secret: process.env.JWT_SECRET_KEY, algorithms: ['HS256'] })));
+        app.use(Middleware_1.handleValidatorErrors);
         return app;
     });
 }
@@ -81,3 +89,4 @@ function main() {
 }
 exports.main = main;
 exports.default = { create, main };
+main();
