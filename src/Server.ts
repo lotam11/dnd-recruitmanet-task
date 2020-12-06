@@ -6,7 +6,7 @@ import http from 'http'
 import morgan from 'morgan'
 import jwt from 'express-jwt'
 
-import PersonHandler from './persons/PersonHandler'
+import PersonHandler from './persons/PersonController'
 import DataProvider, { DataClient } from './data/DataProvider'
 import {handleValidatorErrors, promise, wrapAsync} from './Middleware'
 import {Server} from './Config'
@@ -30,11 +30,10 @@ export async function create () {
     .use(morgan(Server.isDev ? 'dev' : 'combined'))
     .use(bodyParser.json())
     .post("/authorize", asyncHandler(handlers.userHandler.authenticate))
-    // .post("/register", asyncHandler(async (req,res) => res.json({res: "success"})));
-    .post("/register", asyncHandler(handlers.userHandler.register));
-    // .use(
-    //   appRouter.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
-    // );
+    .post("/register", asyncHandler(handlers.userHandler.register))
+    .use(
+      appRouter.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
+    );
   app.use(handleValidatorErrors);
   return app;
 }

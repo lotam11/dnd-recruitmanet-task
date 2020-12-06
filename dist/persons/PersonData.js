@@ -16,7 +16,8 @@ const getPerson = (users) => (id) => __awaiter(void 0, void 0, void 0, function*
 exports.getPerson = getPerson;
 const createPerson = (users) => (input) => __awaiter(void 0, void 0, void 0, function* () {
     const result = (yield users().insert(input, ['id']))[0];
-    return (yield users().select().where({ id: result.id }))[0];
+    const row = yield users().select().where({ id: result });
+    return row[0];
 });
 exports.createPerson = createPerson;
 const getPersonList = (users) => (input) => __awaiter(void 0, void 0, void 0, function* () {
@@ -28,7 +29,7 @@ const getPersonList = (users) => (input) => __awaiter(void 0, void 0, void 0, fu
 exports.getPersonList = getPersonList;
 function create(data) {
     return __awaiter(this, void 0, void 0, function* () {
-        const users = () => data.mysql.table('User');
+        const users = () => data.mysql.table('person');
         return {
             get: exports.getPerson(users),
             getList: exports.getPersonList(users),

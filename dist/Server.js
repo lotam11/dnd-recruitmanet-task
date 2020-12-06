@@ -37,6 +37,7 @@ const chalk_1 = __importDefault(require("chalk"));
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const morgan_1 = __importDefault(require("morgan"));
+const express_jwt_1 = __importDefault(require("express-jwt"));
 const DataProvider_1 = __importDefault(require("./data/DataProvider"));
 const Middleware_1 = require("./Middleware");
 const Config_1 = require("./Config");
@@ -59,11 +60,8 @@ function create() {
             .use(morgan_1.default(Config_1.Server.isDev ? 'dev' : 'combined'))
             .use(body_parser_1.default.json())
             .post("/authorize", express_async_handler_1.default(handlers.userHandler.authenticate))
-            // .post("/register", asyncHandler(async (req,res) => res.json({res: "success"})));
-            .post("/register", express_async_handler_1.default(handlers.userHandler.register));
-        // .use(
-        //   appRouter.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
-        // );
+            .post("/register", express_async_handler_1.default(handlers.userHandler.register))
+            .use(appRouter.use(express_jwt_1.default({ secret: process.env.JWT_SECRET_KEY, algorithms: ['HS256'] })));
         app.use(Middleware_1.handleValidatorErrors);
         return app;
     });

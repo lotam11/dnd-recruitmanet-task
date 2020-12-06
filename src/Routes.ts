@@ -1,12 +1,12 @@
 import {create as createHandlers, Handlers} from './Handlers'
 import {Router} from 'express';
-import { promise, wrapAsync } from './Middleware';
+import asyncHandler from 'express-async-handler';
 
 export async function createRouter(
   handlers: Handlers
 ): Promise<Router>{
   return Router()
-    .post('/person', wrapAsync(handlers.personHandler.create))
-    .get('/users/create', wrapAsync(handlers.personHandler.create));
+    .post('/person', asyncHandler(handlers.personHandler.create))
+    .get('/person/:id', asyncHandler(handlers.personHandler.get));
 
 }

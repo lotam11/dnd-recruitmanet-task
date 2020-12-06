@@ -29,9 +29,9 @@ export const authenticate = (
     if( authService.authenticate(hash, password)){
       res.status(200).json({
         token: await authService.getKey({identifier})
-      })
+      }).end();
     } else
-      res.status(403)
+      res.status(403).end();
   }
 }
 

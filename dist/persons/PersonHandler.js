@@ -13,15 +13,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = exports.createPerson = exports.getCurrentPerson = void 0;
+const joi_1 = __importDefault(require("joi"));
 const PersonController_1 = __importDefault(require("./PersonController"));
 const getCurrentPerson = (persons) => (req) => __awaiter(void 0, void 0, void 0, function* () {
     return persons.get(req.body.id);
 });
 exports.getCurrentPerson = getCurrentPerson;
-const createPerson = (persons) => (req) => __awaiter(void 0, void 0, void 0, function* () {
-    const person = yield persons.create();
-    return person;
-});
+const createPerson = (persons) => {
+    const validation = joi_1.default.object().keys({
+        nickname: joi_1.default.string().required(),
+        fullname: joi_1.default.string().required(),
+        description: joi_1.default.string().required()
+    });
+    return (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        joi_1.default.attempt(req.body, validation);
+        const person = yield persons.create(req.body);
+        res.json(person).end();
+    });
+};
 exports.createPerson = createPerson;
 function create(data) {
     return __awaiter(this, void 0, void 0, function* () {

@@ -1,23 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -27,28 +8,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create = exports.createPerson = exports.getPersonList = exports.getPerson = void 0;
-const PersonData = __importStar(require("./PersonData"));
-const getPerson = (persons) => (input) => __awaiter(void 0, void 0, void 0, function* () {
-    return persons.get(input);
-});
-exports.getPerson = getPerson;
-const getPersonList = (persons) => (input) => __awaiter(void 0, void 0, void 0, function* () {
-    return persons.getList(input);
-});
-exports.getPersonList = getPersonList;
-const createPerson = (persons) => (input) => __awaiter(void 0, void 0, void 0, function* () {
-    return persons.create(input);
-});
+exports.create = exports.get = exports.createPerson = void 0;
+const joi_1 = __importDefault(require("joi"));
+const PersonService_1 = __importDefault(require("./PersonService"));
+const createPerson = (persons) => {
+    const validation = joi_1.default.object().keys({
+        nickname: joi_1.default.string().required(),
+        fullname: joi_1.default.string().required(),
+        description: joi_1.default.string().required()
+    });
+    return (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        joi_1.default.attempt(req.body, validation);
+        const person = yield persons.create(req.body);
+        res.json(person).end();
+    });
+};
 exports.createPerson = createPerson;
+function get(persons) {
+    return (req, res) => __awaiter(this, void 0, void 0, function* () {
+        return res.json(yield persons.get(req.params.id)).end();
+    });
+}
+exports.get = get;
 function create(data) {
     return __awaiter(this, void 0, void 0, function* () {
-        const persons = yield PersonData.create(data);
+        const persons = yield PersonService_1.default.create(data);
         return {
-            get: exports.getPerson(persons),
-            getList: exports.getPersonList(persons),
-            create: exports.createPerson(persons),
+            get: get(persons),
+            create: exports.createPerson(persons)
         };
     });
 }

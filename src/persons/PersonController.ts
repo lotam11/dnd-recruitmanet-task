@@ -1,33 +1,39 @@
-import {Data, GetListInput, Person} from './PersonData';
-import * as PersonData from './PersonData';
+import {Request, Response} from 'express'
+import Joi from 'joi'
 
 import {DataClient} from '../data/DataProvider'
+import PersonService, {Service} from './PersonService'
 
-export interface Controller {
-  get: ReturnType<typeof getPerson>,
-  getList: ReturnType<typeof getPersonList>,
-  create: ReturnType<typeof createPerson>,
+
+export const createPerson = (persons: Service) => { 
+  const validation = Joi.object().keys({ 
+    nickname: Joi.string().required(),
+    fullname: Joi.string().required(),
+    description: Joi.string().required() 
+  });
+
+  return async (req: Request, res: Response) => {
+    Joi.attempt(req.body, validation);
+
+    const person = await persons.create(req.body)
+    
+    res.json(person).end();
+  }
 }
 
-export const getPerson = (persons: Data) => async (input: string) => {
-  return persons.get(input)
+export function get(persons: Service){
+  return async (req: Request, res: Response) =>
+    res.json(
+      await persons.get(req.params.id)
+    ).end();
 }
 
-export const getPersonList = (persons: Data) => async (input?: GetListInput) => {
-  return persons.getList(input)
-}
-
-export const createPerson = (persons: Data) => async (input?: Person) => {
-  return persons.create(input)
-}
-
-export async function create (data: DataClient): Promise<Controller> {
-  const persons = await PersonData.create(data)
+export async function create (data: DataClient) {
+  const persons = await PersonService.create(data)
 
   return {
-    get: getPerson(persons),
-    getList: getPersonList(persons),
-    create: createPerson(persons),
+    get: get(persons),
+    create: createPerson(persons)
   }
 }
 
