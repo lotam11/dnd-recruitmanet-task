@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create = exports.getList = exports.get = exports.createPerson = void 0;
+exports.create = exports.getPersonList = exports.getPerson = exports.updatePerson = exports.createPerson = void 0;
 const joi_1 = __importDefault(require("joi"));
 const PersonService_1 = __importDefault(require("./PersonService"));
 const createPerson = (persons) => {
@@ -28,13 +28,28 @@ const createPerson = (persons) => {
     });
 };
 exports.createPerson = createPerson;
-function get(persons) {
+const updatePerson = (persons) => {
+    const validation = joi_1.default.object().keys({
+        nickname: joi_1.default.string().required(),
+        fullname: joi_1.default.string().required(),
+        description: joi_1.default.string().required(),
+        id: joi_1.default.number().required(),
+    });
+    return (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const input = Object.assign(Object.assign({}, req.body), { id: req.params.id });
+        joi_1.default.attempt(input, validation);
+        const person = yield persons.update(req.body);
+        res.json(person).end();
+    });
+};
+exports.updatePerson = updatePerson;
+function getPerson(persons) {
     return (req, res) => __awaiter(this, void 0, void 0, function* () {
         return res.json(yield persons.get(req.params.id)).end();
     });
 }
-exports.get = get;
-function getList(persons) {
+exports.getPerson = getPerson;
+function getPersonList(persons) {
     return (req, res) => __awaiter(this, void 0, void 0, function* () {
         return res.json(yield persons.getList({
             offset: parseInt(req.query.query),
@@ -42,14 +57,15 @@ function getList(persons) {
         })).end();
     });
 }
-exports.getList = getList;
+exports.getPersonList = getPersonList;
 function create(data) {
     return __awaiter(this, void 0, void 0, function* () {
         const persons = yield PersonService_1.default.create(data);
         return {
-            get: get(persons),
+            get: getPerson(persons),
             create: exports.createPerson(persons),
-            getList: getList(persons)
+            getList: getPersonList(persons),
+            update: exports.updatePerson(persons)
         };
     });
 }

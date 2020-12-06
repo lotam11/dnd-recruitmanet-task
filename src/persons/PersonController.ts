@@ -21,14 +21,33 @@ export const createPerson = (persons: Service) => {
   }
 }
 
-export function get(persons: Service){
+export const updatePerson = (persons: Service) => { 
+  const validation = Joi.object().keys({ 
+    nickname: Joi.string().required(),
+    fullname: Joi.string().required(),
+    description: Joi.string().required(), 
+    id: Joi.number().required(),
+  });
+
+  return async (req: Request, res: Response) => {
+    const input = {...req.body, id: req.params.id}
+
+    Joi.attempt(input, validation);
+
+    const person = await persons.update(req.body)
+    
+    res.json(person).end();
+  }
+}
+
+export function getPerson(persons: Service){
   return async (req: Request, res: Response) =>
     res.json(
       await persons.get(req.params.id)
     ).end();
 }
 
-export function getList(persons: Service) {
+export function getPersonList(persons: Service) {
   return async (req: Request, res: Response) =>
     res.json(
       await persons.getList({
@@ -42,9 +61,10 @@ export async function create (data: DataClient) {
   const persons = await PersonService.create(data)
 
   return {
-    get: get(persons),
+    get: getPerson(persons),
     create: createPerson(persons),
-    getList: getList(persons)
+    getList: getPersonList(persons),
+    update: updatePerson(persons)
   }
 }
 

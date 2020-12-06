@@ -7,18 +7,17 @@ export interface Service {
   get: ReturnType<typeof getPerson>,
   getList: ReturnType<typeof getPersonList>,
   create: ReturnType<typeof createPerson>,
+  update: ReturnType<typeof updatePerson>
 }
 
-export const getPerson = (persons: Data) => async (input: string) => {
-  return persons.get(input)
-}
+export const getPerson = (persons: Data) => persons.get
 
-export const getPersonList = (persons: Data) => 
-  persons.getList;
+export const getPersonList = (persons: Data) => persons.getList;
 
-export const createPerson = (persons: Data) => async (input?: Person) => {
-  return persons.create(input)
-}
+export const createPerson = (persons: Data) => persons.create
+
+export const updatePerson = (persons: Data) => persons.update
+
 
 export async function create (data: DataClient): Promise<Service> {
   const persons = await PersonData.create(data)
@@ -27,6 +26,7 @@ export async function create (data: DataClient): Promise<Service> {
     get: getPerson(persons),
     getList: getPersonList(persons),
     create: createPerson(persons),
+    update: updatePerson(persons)
   }
 }
 

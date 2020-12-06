@@ -18,6 +18,15 @@ export const createPerson = (users: () => QueryBuilder) => async (input?: Person
   return (row as Person[])[0]
 }
 
+
+export const updatePerson = (users: () => QueryBuilder) => async (input: Person) => {
+  const result = await users()
+    .select(input.id)
+    .update(input) as Person 
+    console.log(result);
+    return result
+}
+
 interface PersonQueryParameters {
   offset: number | null,
   limit: number | null
@@ -31,7 +40,7 @@ export const getPersonList = (persons: () => QueryBuilder) =>
       query = query.where("id", ">", parameters.offset);
     
     if(parameters.limit)
-       query = query.limit(parameters.limit);
+      query = query.limit(parameters.limit);
 
     return (await query as Person[])
   }
@@ -40,7 +49,8 @@ export const getPersonList = (persons: () => QueryBuilder) =>
 export interface Data {
   get: ReturnType<typeof getPerson>,
   getList: ReturnType<typeof getPersonList>,
-  create: ReturnType<typeof createPerson>
+  create: ReturnType<typeof createPerson>,
+  update: ReturnType<typeof updatePerson>
 }
 
 export async function create (data: DataClient): Promise<Data> {
@@ -50,5 +60,6 @@ export async function create (data: DataClient): Promise<Data> {
     get: getPerson(users),
     getList: getPersonList(users),
     create: createPerson(users),
+    update: updatePerson(users)
   }
 }

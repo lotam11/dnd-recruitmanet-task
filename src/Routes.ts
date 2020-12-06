@@ -8,5 +8,6 @@ export async function createRouter(
   return Router()
     .post('/persons', asyncHandler(handlers.personHandler.create))
     .get('/persons/:id', asyncHandler(handlers.personHandler.get))
+    .put('/persons/:id', asyncHandler(handlers.personHandler.update))
     .get('/persons', asyncHandler(handlers.personHandler.getList));
 }
