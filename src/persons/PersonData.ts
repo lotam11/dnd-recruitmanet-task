@@ -18,14 +18,23 @@ export const createPerson = (users: () => QueryBuilder) => async (input?: Person
   return (row as Person[])[0]
 }
 
-export interface GetListInput extends Omit<Person, 'id'> {}
-
-export const getPersonList = (users: () => QueryBuilder) => async (input?: GetListInput) => {
-  const query = users().select()
-  if (input) query.where(input)
-
-  return (await query as Person[])
+interface PersonQueryParameters {
+  offset: number | null,
+  limit: number | null
 }
+
+export const getPersonList = (persons: () => QueryBuilder) => 
+  async (parameters: PersonQueryParameters) => {
+    let query = persons().select();
+    
+    if(parameters.offset)
+      query = query.where("id", ">", parameters.offset);
+    
+    if(parameters.limit)
+       query = query.limit(parameters.limit);
+
+    return (await query as Person[])
+  }
 
  
 export interface Data {

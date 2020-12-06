@@ -28,12 +28,23 @@ export function get(persons: Service){
     ).end();
 }
 
+export function getList(persons: Service) {
+  return async (req: Request, res: Response) =>
+    res.json(
+      await persons.getList({
+        offset: parseInt(req.query.query as string),
+        limit: parseInt(req.query.limit as string)
+      })
+    ).end();
+}
+
 export async function create (data: DataClient) {
   const persons = await PersonService.create(data)
 
   return {
     get: get(persons),
-    create: createPerson(persons)
+    create: createPerson(persons),
+    getList: getList(persons)
   }
 }
 

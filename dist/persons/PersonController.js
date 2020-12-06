@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create = exports.get = exports.createPerson = void 0;
+exports.create = exports.getList = exports.get = exports.createPerson = void 0;
 const joi_1 = __importDefault(require("joi"));
 const PersonService_1 = __importDefault(require("./PersonService"));
 const createPerson = (persons) => {
@@ -34,12 +34,22 @@ function get(persons) {
     });
 }
 exports.get = get;
+function getList(persons) {
+    return (req, res) => __awaiter(this, void 0, void 0, function* () {
+        return res.json(yield persons.getList({
+            offset: parseInt(req.query.query),
+            limit: parseInt(req.query.limit)
+        })).end();
+    });
+}
+exports.getList = getList;
 function create(data) {
     return __awaiter(this, void 0, void 0, function* () {
         const persons = yield PersonService_1.default.create(data);
         return {
             get: get(persons),
-            create: exports.createPerson(persons)
+            create: exports.createPerson(persons),
+            getList: getList(persons)
         };
     });
 }

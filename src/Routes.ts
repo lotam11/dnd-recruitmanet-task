@@ -6,7 +6,7 @@ export async function createRouter(
   handlers: Handlers
 ): Promise<Router>{
   return Router()
-    .post('/person', asyncHandler(handlers.personHandler.create))
-    .get('/person/:id', asyncHandler(handlers.personHandler.get));
-
+    .post('/persons', asyncHandler(handlers.personHandler.create))
+    .get('/persons/:id', asyncHandler(handlers.personHandler.get))
+    .get('/persons', asyncHandler(handlers.personHandler.getList));
 }

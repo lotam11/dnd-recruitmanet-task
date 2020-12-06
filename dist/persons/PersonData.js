@@ -20,10 +20,12 @@ const createPerson = (users) => (input) => __awaiter(void 0, void 0, void 0, fun
     return row[0];
 });
 exports.createPerson = createPerson;
-const getPersonList = (users) => (input) => __awaiter(void 0, void 0, void 0, function* () {
-    const query = users().select();
-    if (input)
-        query.where(input);
+const getPersonList = (persons) => (parameters) => __awaiter(void 0, void 0, void 0, function* () {
+    let query = persons().select();
+    if (parameters.offset)
+        query = query.where("id", ">", parameters.offset);
+    if (parameters.limit)
+        query = query.limit(parameters.limit);
     return yield query;
 });
 exports.getPersonList = getPersonList;

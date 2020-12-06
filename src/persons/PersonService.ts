@@ -1,4 +1,4 @@
-import {Data, GetListInput, Person} from './PersonData';
+import {Data, Person} from './PersonData';
 import * as PersonData from './PersonData';
 
 import {DataClient} from '../data/DataProvider'
@@ -13,9 +13,8 @@ export const getPerson = (persons: Data) => async (input: string) => {
   return persons.get(input)
 }
 
-export const getPersonList = (persons: Data) => async (input?: GetListInput) => {
-  return persons.getList(input)
-}
+export const getPersonList = (persons: Data) => 
+  persons.getList;
 
 export const createPerson = (persons: Data) => async (input?: Person) => {
   return persons.create(input)
