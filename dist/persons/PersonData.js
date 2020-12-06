@@ -20,7 +20,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create = exports.getPersonList = exports.updatePerson = exports.createPerson = exports.getPerson = void 0;
+exports.create = exports.getPersonList = exports.deletePerson = exports.updatePerson = exports.createPerson = exports.getPerson = void 0;
 const getPerson = (users) => (id) => __awaiter(void 0, void 0, void 0, function* () {
     return (yield users().select().where({ id }))[0];
 });
@@ -39,6 +39,12 @@ const updatePerson = (users) => (input) => __awaiter(void 0, void 0, void 0, fun
     return yield users().select().where({ id });
 });
 exports.updatePerson = updatePerson;
+const deletePerson = (users) => (id) => __awaiter(void 0, void 0, void 0, function* () {
+    yield users()
+        .where({ id })
+        .delete();
+});
+exports.deletePerson = deletePerson;
 const getPersonList = (persons) => (parameters) => __awaiter(void 0, void 0, void 0, function* () {
     let query = persons().select();
     if (parameters.offset)
@@ -55,7 +61,8 @@ function create(data) {
             get: exports.getPerson(users),
             getList: exports.getPersonList(users),
             create: exports.createPerson(users),
-            update: exports.updatePerson(users)
+            update: exports.updatePerson(users),
+            delete: exports.deletePerson(users)
         };
     });
 }

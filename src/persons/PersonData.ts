@@ -8,25 +8,35 @@ export interface Person {
   description?: string
 }
 
-export const getPerson = (users: () => QueryBuilder) => async (id: string) => {
-  return (await users().select().where({id}) as Person[])[0]
-} 
+export const getPerson = (users: () => QueryBuilder) => 
+  async (id: string) => {
+    return (await users().select().where({id}) as Person[])[0]
+  } 
 
-export const createPerson = (users: () => QueryBuilder) => async (input?: Person) => {
-  const result = (await users().insert(input, ['id']) as [{id: string}])[0]
-  const row = await users().select().where({id: result});
-  return (row as Person[])[0]
-}
+export const createPerson = (users: () => QueryBuilder) => 
+  async (input?: Person) => {
+    const result = (await users().insert(input, ['id']) as [{id: string}])[0]
+    const row = await users().select().where({id: result});
+    return (row as Person[])[0]
+  }
 
 
-export const updatePerson = (users: () => QueryBuilder) => async (input: Person) => {
-  const {id, ...rest} = input;
-  await users()
-    .where({id})
-    .update(rest);
+export const updatePerson = (users: () => QueryBuilder) => 
+  async (input: Person) => {
+    const {id, ...rest} = input;
+    await users()
+      .where({id})
+      .update(rest);
 
-  return await users().select().where({id});
-}
+    return await users().select().where({id});
+  }
+
+export const deletePerson = (users: () => QueryBuilder) => 
+  async (id : number) => {
+    await users()
+      .where({id})
+      .delete(); 
+  }
 
 interface PersonQueryParameters {
   offset: number | null,
@@ -52,6 +62,7 @@ export interface Data {
   getList: ReturnType<typeof getPersonList>,
   create: ReturnType<typeof createPerson>,
   update: ReturnType<typeof updatePerson>
+  delete: ReturnType<typeof deletePerson>
 }
 
 export async function create (data: DataClient): Promise<Data> {
@@ -61,6 +72,7 @@ export async function create (data: DataClient): Promise<Data> {
     get: getPerson(users),
     getList: getPersonList(users),
     create: createPerson(users),
-    update: updatePerson(users)
+    update: updatePerson(users),
+    delete: deletePerson(users)
   }
 }

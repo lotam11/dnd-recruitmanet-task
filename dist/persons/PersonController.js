@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create = exports.getPersonList = exports.getPerson = exports.updatePerson = exports.createPerson = void 0;
+exports.create = exports.deletePerson = exports.getPersonList = exports.getPerson = exports.updatePerson = exports.createPerson = void 0;
 const joi_1 = __importDefault(require("joi"));
 const PersonService_1 = __importDefault(require("./PersonService"));
 const createPerson = (persons) => {
@@ -58,6 +58,18 @@ function getPersonList(persons) {
     });
 }
 exports.getPersonList = getPersonList;
+function deletePerson(persons) {
+    return (req, res) => __awaiter(this, void 0, void 0, function* () {
+        if (isNaN(+req.params.id)) {
+            res.status(400).json({ error: "id must be a number" }).end();
+            return;
+        }
+        const id = parseInt(req.params.id);
+        yield persons.delete(id);
+        res.status(200).end();
+    });
+}
+exports.deletePerson = deletePerson;
 function create(data) {
     return __awaiter(this, void 0, void 0, function* () {
         const persons = yield PersonService_1.default.create(data);
@@ -65,7 +77,8 @@ function create(data) {
             get: getPerson(persons),
             create: exports.createPerson(persons),
             getList: getPersonList(persons),
-            update: exports.updatePerson(persons)
+            update: exports.updatePerson(persons),
+            delete: deletePerson(persons)
         };
     });
 }

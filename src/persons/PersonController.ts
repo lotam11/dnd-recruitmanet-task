@@ -57,6 +57,21 @@ export function getPersonList(persons: Service) {
     ).end();
 }
 
+export function deletePerson(persons: Service) {
+  return async (req: Request, res:Response) => {
+    if(isNaN(+req.params.id)){
+      res.status(400).json({error: "id must be a number"}).end();
+      return
+    }
+
+    const id = parseInt(req.params.id);
+
+    await persons.delete(id);
+    res.status(200).end()
+
+  }
+}
+
 export async function create (data: DataClient) {
   const persons = await PersonService.create(data)
 
@@ -64,7 +79,8 @@ export async function create (data: DataClient) {
     get: getPerson(persons),
     create: createPerson(persons),
     getList: getPersonList(persons),
-    update: updatePerson(persons)
+    update: updatePerson(persons),
+    delete: deletePerson(persons)
   }
 }
 
