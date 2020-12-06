@@ -38,7 +38,7 @@ const updatePerson = (persons) => {
     return (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const input = Object.assign(Object.assign({}, req.body), { id: req.params.id });
         joi_1.default.attempt(input, validation);
-        const person = yield persons.update(req.body);
+        const person = yield persons.update(input);
         res.json(person).end();
     });
 };

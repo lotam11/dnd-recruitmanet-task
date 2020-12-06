@@ -20,11 +20,12 @@ export const createPerson = (users: () => QueryBuilder) => async (input?: Person
 
 
 export const updatePerson = (users: () => QueryBuilder) => async (input: Person) => {
-  const result = await users()
-    .select(input.id)
-    .update(input) as Person 
-    console.log(result);
-    return result
+  const {id, ...rest} = input;
+  await users()
+    .where({id})
+    .update(rest);
+
+  return await users().select().where({id});
 }
 
 interface PersonQueryParameters {

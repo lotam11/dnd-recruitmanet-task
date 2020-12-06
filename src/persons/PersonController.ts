@@ -34,7 +34,7 @@ export const updatePerson = (persons: Service) => {
 
     Joi.attempt(input, validation);
 
-    const person = await persons.update(req.body)
+    const person = await persons.update(input)
     
     res.json(person).end();
   }
