@@ -8,12 +8,12 @@ import jwt from 'express-jwt'
 
 import PersonHandler from './persons/PersonHandler'
 import DataProvider, { DataClient } from './data/DataProvider'
-import {handleValidatorErrors, promise, asyncHandler} from './Middleware'
+import {handleValidatorErrors, promise, wrapAsync} from './Middleware'
 import {Server} from './Config'
 import * as Handlers from './Handlers'
 import { createRouter } from './Routes';
-import * as JwtAuth from './user/auth/JWTAuthService'
-
+import * as JwtAuth from './user/auth/JWTAuthService';
+import asyncHandler from 'express-async-handler';
 
 export async function create () {
   const app = express();
@@ -22,18 +22,19 @@ export async function create () {
     secretkey: Server.jwtSecret as string,
     expiresIn: 400
   })
-  const handlers = await Handlers.create(data,authService);
+  const handlers = await Handlers.create(data, authService);
   const appRouter = await createRouter(handlers);
   
   app
     .disable('x-powered-by')
     .use(morgan(Server.isDev ? 'dev' : 'combined'))
     .use(bodyParser.json())
-    .post("/authorize", promise(handlers.userHandler.authenticate))
-    .post("/register", promise(handlers.userHandler.register))
-    .use(
-      appRouter.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
-    );
+    .post("/authorize", asyncHandler(handlers.userHandler.authenticate))
+    // .post("/register", asyncHandler(async (req,res) => res.json({res: "success"})));
+    .post("/register", asyncHandler(handlers.userHandler.register));
+    // .use(
+    //   appRouter.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
+    // );
   app.use(handleValidatorErrors);
   return app;
 }

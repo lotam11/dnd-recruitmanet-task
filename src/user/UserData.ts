@@ -19,7 +19,8 @@ export interface Data {
 
 export const getHash = (users: () => QueryBuilder) => 
   async (identifier: string) => {
-    return (await users().select().where({identifier})).hash as string
+    const [result] = await users().select().where({identifier}).limit(1);
+    return result.hash as string
   }
 
 export const createUser = (users: () => QueryBuilder) => async (input?: UserInput) => {

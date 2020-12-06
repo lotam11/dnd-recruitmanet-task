@@ -22,15 +22,15 @@ export const authenticate = (
     const hash = await users.getHash(identifier);
 
     if (hash == undefined || hash === "" ){
-      res.status(404);
+      res.status(404).end();
       return;
     }
 
-    if( authService.authenticate(hash, password))
-      res.json({
-        token: authService.getKey({identifier})
+    if( authService.authenticate(hash, password)){
+      res.status(200).json({
+        token: await authService.getKey({identifier})
       })
-    else
+    } else
       res.status(403)
   }
 }
@@ -41,14 +41,19 @@ export const register = (users: Service) => {
     password: joi.string().required() 
   });
 
-  return async (req: Request, res: Response) => {
+  return async (req: Request, res: Response, next: any) => {
     joi.attempt(req.body, validation);
+    
     const user = await users.create(req.body);
-    response.status(200);
+
+    res.status(200).json({success: true});
   }
 }
 
-export async function create (data: DataClient, authService: IAuthService) {
+export async function create (
+  data: DataClient, 
+  authService: IAuthService
+) {
   const users = await UserController.create(data)
 
   return {

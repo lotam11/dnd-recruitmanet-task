@@ -10,8 +10,10 @@ export const authenticate = () =>
       hash
     )
 
-export const getKey = (secretKey: string, expiresIn: number) =>
-    async(data: Object) => jwt.sign(data, secretKey, {expiresIn});
+export const getKey = (secretKey: string, expiresIn: number) => 
+    async(data: Object) => { 
+      return jwt.sign(data, secretKey, {expiresIn})
+    };
 
 
 interface JWTAuthServiceConfiguation {

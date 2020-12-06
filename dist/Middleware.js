@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.asyncHandler = exports.handleValidatorErrors = exports.promise = void 0;
+exports.wrapAsync = exports.handleValidatorErrors = exports.promise = void 0;
 const joi_1 = require("joi");
 const promise = (middleware) => ((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -38,7 +38,25 @@ const handleValidatorErrors = (err, req, res, next) => {
 };
 exports.handleValidatorErrors = handleValidatorErrors;
 exports.default = { promise: exports.promise };
-const asyncHandler = (fn) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    return next(yield fn(req, res).catch(next));
-});
-exports.asyncHandler = asyncHandler;
+function wrapAsync(fn) {
+    function asyncifyWrap(req, res, next) {
+        return __awaiter(this, arguments, void 0, function* () {
+            try {
+                return yield fn.apply(null, arguments);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+    }
+    return asyncifyWrap;
+}
+exports.wrapAsync = wrapAsync;
+//   console.log(fn);
+//   return async function(req: any, res: any, next: any) {
+//     // Make sure to `.catch()` any errors and pass them along to the `next()`
+//     // middleware in the chain, in this case the error handler.
+//     const result = fn(req, res);
+//     Promise.resolve(result).catch(next);
+//   };
+// }

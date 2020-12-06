@@ -43,6 +43,7 @@ const Config_1 = require("./Config");
 const Handlers = __importStar(require("./Handlers"));
 const Routes_1 = require("./Routes");
 const JwtAuth = __importStar(require("./user/auth/JWTAuthService"));
+const express_async_handler_1 = __importDefault(require("express-async-handler"));
 function create() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = express_1.default();
@@ -57,8 +58,9 @@ function create() {
             .disable('x-powered-by')
             .use(morgan_1.default(Config_1.Server.isDev ? 'dev' : 'combined'))
             .use(body_parser_1.default.json())
-            .post("/authorize", Middleware_1.promise(handlers.userHandler.authenticate))
-            .post("/register", Middleware_1.promise(handlers.userHandler.register));
+            .post("/authorize", express_async_handler_1.default(handlers.userHandler.authenticate))
+            // .post("/register", asyncHandler(async (req,res) => res.json({res: "success"})));
+            .post("/register", express_async_handler_1.default(handlers.userHandler.register));
         // .use(
         //   appRouter.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
         // );
