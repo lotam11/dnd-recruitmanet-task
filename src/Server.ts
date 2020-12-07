@@ -6,13 +6,13 @@ import http from 'http'
 import morgan from 'morgan'
 import jwt from 'express-jwt'
 
-import PersonHandler from './persons/PersonController'
+import PersonHandler from './app/persons/PersonController'
 import DataProvider, { DataClient } from './data/DataProvider'
 import {handleValidatorErrors, promise, wrapAsync} from './Middleware'
 import {Server} from './Config'
 import * as Handlers from './Handlers'
 import { createRouter } from './Routes';
-import * as JwtAuth from './user/auth/JWTAuthService';
+import * as JwtAuth from './auth/JWTAuthService';
 import asyncHandler from 'express-async-handler';
 
 export async function create () {

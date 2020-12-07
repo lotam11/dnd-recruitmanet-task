@@ -1,6 +1,6 @@
 import {Request} from 'express'
 
-import {DataClient} from '../../data/DataProvider'
+import {DataClient} from '../../../data/DataProvider'
 import FilmsController, {Controller} from './FilmsController'
 
 export const getCurrentFilms = (filmss: Controller) => async (req: Request) => {

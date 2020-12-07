@@ -20,6 +20,7 @@
     "@types/express-jwt": "0.0.42",
     "@types/joi": "^14.3.4",
     "@types/jsonwebtoken": "^8.5.0",
+    "@types/node-cache": "^4.2.5",
     "bcrypt": "^5.0.0",
     "chalk": "^4.1.0",
     "cookie-session": "^1.4.0",
@@ -33,6 +34,7 @@
     "knex-migrate": "^1.7.4",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
+    "node-cache": "^5.1.2",
     "sqlite3": "^5.0.0"
   },
   "devDependencies": {

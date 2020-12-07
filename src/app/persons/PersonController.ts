@@ -1,11 +1,12 @@
 import {Request, Response} from 'express'
 import Joi from 'joi'
 
-import {DataClient} from '../data/DataProvider'
-import PersonService, {Service} from './PersonService'
+import {DataClient} from '../../data/DataProvider'
+import { Person } from './PersonData'
+import {Service as PersonService} from './PersonService'
 
 
-export const createPerson = (persons: Service) => { 
+export const createPerson = (persons: PersonService) => { 
   const validation = Joi.object().keys({ 
     nickname: Joi.string().required(),
     fullname: Joi.string().required(),
@@ -21,7 +22,7 @@ export const createPerson = (persons: Service) => {
   }
 }
 
-export const updatePerson = (persons: Service) => { 
+export const updatePerson = (persons: PersonService) => { 
   const validation = Joi.object().keys({ 
     nickname: Joi.string().required(),
     fullname: Joi.string().required(),
@@ -40,14 +41,14 @@ export const updatePerson = (persons: Service) => {
   }
 }
 
-export function getPerson(persons: Service){
+export function getPerson(persons: PersonService){
   return async (req: Request, res: Response) =>
     res.json(
       await persons.get(req.params.id)
     ).end();
 }
 
-export function getPersonList(persons: Service) {
+export function getPersonList(persons: PersonService) {
   return async (req: Request, res: Response) =>
     res.json(
       await persons.getList({
@@ -57,7 +58,7 @@ export function getPersonList(persons: Service) {
     ).end();
 }
 
-export function deletePerson(persons: Service) {
+export function deletePerson(persons: PersonService) {
   return async (req: Request, res:Response) => {
     if(isNaN(+req.params.id)){
       res.status(400).json({error: "id must be a number"}).end();
@@ -72,8 +73,7 @@ export function deletePerson(persons: Service) {
   }
 }
 
-export async function create (data: DataClient) {
-  const persons = await PersonService.create(data)
+export async function create (persons: PersonService) {
 
   return {
     get: getPerson(persons),

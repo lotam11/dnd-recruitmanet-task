@@ -1,7 +1,7 @@
 import {Data, GetListInput, PersonFilm} from './FilmsData';
 import * as FilmData from './FilmsData';
 
-import {DataClient} from '../../data/DataProvider'
+import {DataClient} from '../../../data/DataProvider'
 
 export interface Controller {
   get: ReturnType<typeof getFilm>,

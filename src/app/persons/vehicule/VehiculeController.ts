@@ -1,7 +1,7 @@
 import {Data, GetListInput, PersonVehicule} from './VehiculeData';
 import * as VehiculeData from './VehiculeData';
 
-import {DataClient} from '../../data/DataProvider'
+import {DataClient} from '../../../data/DataProvider'
 
 export interface Controller {
   get: ReturnType<typeof getVehicule>,

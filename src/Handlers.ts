@@ -1,18 +1,30 @@
 import { DataClient } from "./data/DataProvider";
-import PersonController from "./persons/PersonController";
-import FilmsHandler from "./persons/films/FilmsHandler";
-import StarshipHandler from "./persons/starships/StarshipHandler";
-import VehiculeHandler from "./persons/vehicule/VehiculeHandler";
-import UserHandler from "./user/UserController"
+import PersonController from "./app/persons/PersonController";
+import PersonService from "./app/persons/PersonService";
+import * as PersonData from "./app/persons/PersonData";
+import FilmsHandler from "./app/persons/films/FilmsHandler";
+import StarshipHandler from "./app/persons/starships/StarshipHandler";
+import VehiculeHandler from "./app/persons/vehicule/VehiculeHandler";
+import * as NodeCacheService from "./cache/NodeCahceService"
+import UserHandler from "./app/user/UserController"
 import { Server } from "./Config";
-import { IAuthService } from "./user/auth";
+import { IAuthService } from "./auth";
 
 export async function create (
   data: DataClient,
   auth: IAuthService
 ){
   return {
-    personHandler: (await PersonController.create(data)),
+    personHandler: (await PersonController.create(
+      await PersonService.create(
+        await PersonData.create(
+          data,
+          NodeCacheService.create({
+            stdTTL: 86400
+          })
+        )
+      )
+    )),
     filmsHandler: (await FilmsHandler.create(data)),
     starshipHandler: (await StarshipHandler.create(data)),
     vehiculeHandler: (await VehiculeHandler.create(data)),

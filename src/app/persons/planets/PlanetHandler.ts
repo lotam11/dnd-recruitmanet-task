@@ -1,6 +1,6 @@
 import {Request} from 'express'
 
-import {DataClient} from '../../data/DataProvider'
+import {DataClient} from '../../../data/DataProvider'
 import PlanetController, {Controller} from './PlanetController'
 
 export const getCurrentPlanet = (planets: Controller) => async (req: Request) => {

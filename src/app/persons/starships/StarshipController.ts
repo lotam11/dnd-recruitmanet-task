@@ -1,7 +1,7 @@
 import {Data, GetListInput, PersonStarship} from './StarshipData';
 import * as StarshipData from './StarshipData';
 
-import {DataClient} from '../../data/DataProvider'
+import {DataClient} from '../../../data/DataProvider'
 
 export interface Controller {
   get: ReturnType<typeof getStarship>,

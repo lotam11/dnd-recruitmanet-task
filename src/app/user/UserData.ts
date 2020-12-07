@@ -1,5 +1,5 @@
 import {QueryBuilder} from 'knex';
-import {DataClient} from '../data/DataProvider';
+import {DataClient} from '../../data/DataProvider';
 
 export interface User {
   id: number,

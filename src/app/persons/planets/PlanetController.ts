@@ -1,7 +1,7 @@
 import {Data, GetListInput, PersonPlanet} from './PlanetData';
 import * as PlanetData from './PlanetData';
 
-import {DataClient} from '../../data/DataProvider'
+import {DataClient} from '../../../data/DataProvider'
 
 export interface Controller {
   get: ReturnType<typeof getPlanet>,

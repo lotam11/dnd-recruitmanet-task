@@ -1,6 +1,6 @@
 import {Request} from 'express'
 
-import {DataClient} from '../../data/DataProvider'
+import {DataClient} from '../../../data/DataProvider'
 import StarshipController, {Controller} from './StarshipController'
 
 export const getCurrentStarship = (starships: Controller) => async (req: Request) => {

@@ -1,8 +1,9 @@
 import {Data, Person} from './PersonData';
 import * as PersonData from './PersonData';
 
-import {DataClient} from '../data/DataProvider'
+import {DataClient} from '../../data/DataProvider'
 import { preferences } from 'joi';
+import { ICacheService } from '../../cache';
 
 export interface Service {
   get: ReturnType<typeof getPerson>,
@@ -23,9 +24,9 @@ export const updatePerson = (persons: Data) => persons.update;
 export const deletePerson = (persons: Data) => persons.delete;
 
 
-export async function create (data: DataClient): Promise<Service> {
-  const persons = await PersonData.create(data)
-
+export async function create (
+  persons: PersonData.Data,
+): Promise<Service> {
   return {
     get: getPerson(persons),
     getList: getPersonList(persons),

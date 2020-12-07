@@ -1,8 +1,8 @@
 import {Data, UserInput, User} from './UserData';
 import * as UserData from './UserData';
 import bcrypt from 'bcrypt';
-import {DataClient} from '../data/DataProvider'
-import {IAuthService} from "./auth/index"
+import {DataClient} from '../../data/DataProvider'
+import {IAuthService} from "../../auth/index"
 
 interface AuthenticationInput {
   identifier: string,

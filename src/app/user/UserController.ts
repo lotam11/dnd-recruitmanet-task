@@ -1,8 +1,8 @@
 import {request, Request, response, Response} from 'express'
 import joi from 'joi';
 
-import {DataClient} from '../data/DataProvider'
-import { IAuthService } from './auth';
+import {DataClient} from '../../data/DataProvider'
+import { IAuthService } from '../../auth';
 import UserController, {Service} from './UserService'
 
 export const authenticate = (
