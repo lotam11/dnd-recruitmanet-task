@@ -24,7 +24,7 @@ export async function create () {
 
     return knex
   } catch (error) {
-    throw new Error('Unable to connect to Postgres via Knex. Ensure a valid connection.')
+    throw new Error('Unable to connect to Mysql via Knex. Ensure a valid connection.')
   }
 }
 

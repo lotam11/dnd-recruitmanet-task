@@ -1,5 +1,8 @@
 require('dotenv').config();
 
+// console.log(process.env.MYSQL_DB);
+// console.log(process.env.MYSQL_USER);
+// console.log(process.env.MYSQL_PASSWORD);
 export default {
   client: 'mysql',
   connection: {
