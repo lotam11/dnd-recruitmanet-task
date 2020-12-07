@@ -4,10 +4,10 @@ import {DataClient} from '../../../data/DataProvider';
 
 export interface PersonsVehicule {
   id: string
-  title: string,
+  name: string,
   description: string,
-  release_date?: string,
-  PersonsVehiculeVehicule_id: string
+  year_of_production?: string,
+  speed?: string
 }
 
 export const getPersonsVehicule = (users: () => QueryBuilder, cache: ICacheService) => 

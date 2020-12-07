@@ -3,26 +3,26 @@ import { ICacheService } from '../../../cache';
 import {DataClient} from '../../../data/DataProvider';
 
 export interface PersonStarship {
-  id: number,
-  title: string,
+  id: string
+  name: string,
   description: string,
-  release_date?: string,
-  PersonStarshipStarship_id: string
+  year_of_production?: string,
+  speed?: string
 }
 
-export const getPersonStarship = (users: () => QueryBuilder, cache: ICacheService) => 
+export const getPersonStarship = (starships: () => QueryBuilder, cache: ICacheService) => 
   async (id: string) => {
     return cache
       .get(id)
       .resolve(async() =>
-          (await users().select().where({id}))[0] as PersonStarship
+          (await starships().select().where({id}))[0] as PersonStarship
       )
   } 
 
-export const createPersonStarship = (users: () => QueryBuilder, cache: ICacheService) => 
+export const createPersonStarship = (starships: () => QueryBuilder, cache: ICacheService) => 
   async (input?: PersonStarship) => {
-    const result = (await users().insert(input, ['id']))[0] as number;
-    const [row] = await users().select().where({id: result});
+    const result = (await starships().insert(input, ['id']))[0] as number;
+    const [row] = await starships().select().where({id: result});
     return cache.set(
       result,
       row
@@ -30,20 +30,20 @@ export const createPersonStarship = (users: () => QueryBuilder, cache: ICacheSer
   }
 
 
-export const updatePersonStarship = (users: () => QueryBuilder, cache: ICacheService) => 
+export const updatePersonStarship = (starships: () => QueryBuilder, cache: ICacheService) => 
   async (input: PersonStarship) => {
     const {id, ...rest} = input;
-    await users().where({id}).update(rest);
+    await starships().where({id}).update(rest);
 
     return await cache.set(
       id,
-      await users().select().where({id})
+      await starships().select().where({id})
     );
   }
 
-export const deletePersonStarship = (users: () => QueryBuilder, cache: ICacheService) => 
+export const deletePersonStarship = (starships: () => QueryBuilder, cache: ICacheService) => 
   async (id : number) => {
-    await users()
+    await starships()
       .where({id})
       .delete()
       .then(() => cache.remove(id)); 
@@ -84,13 +84,13 @@ export async function create (
   data: DataClient,
   cache: ICacheService
 ): Promise<Data> {
-  const users = () => data.mysql.table('personstarship')
+  const starships = () => data.mysql.table('personstarship')
 
   return {
-    get: getPersonStarship(users, cache),
-    getList: getPersonStarshipList(users, cache),
-    create: createPersonStarship(users, cache),
-    update: updatePersonStarship(users, cache),
-    delete: deletePersonStarship(users, cache)
+    get: getPersonStarship(starships, cache),
+    getList: getPersonStarshipList(starships, cache),
+    create: createPersonStarship(starships, cache),
+    update: updatePersonStarship(starships, cache),
+    delete: deletePersonStarship(starships, cache)
   }
 }

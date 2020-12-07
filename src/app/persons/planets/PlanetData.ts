@@ -4,11 +4,15 @@ import {DataClient} from '../../../data/DataProvider';
 
 export interface PersonPlanet {
   id: number,
-  title: string,
+  name: string,
   description: string,
-  release_date?: string,
-  PersonPlanetPlanet_id: string
+  weight?: string,
+  orbit_diameter?: string,
+  radius?: string,
+  area?: string,
+  density?: string,
 }
+
 export const getPersonPlanet = (users: () => QueryBuilder, cache: ICacheService) => 
   async (id: string) => {
     return cache
