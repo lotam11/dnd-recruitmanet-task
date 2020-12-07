@@ -1,10 +1,6 @@
 import {Data, Person} from './PersonData';
 import * as PersonData from './PersonData';
 
-import {DataClient} from '../../data/DataProvider'
-import { preferences } from 'joi';
-import { ICacheService } from '../../cache';
-
 export interface Service {
   get: ReturnType<typeof getPerson>,
   getList: ReturnType<typeof getPersonList>,

@@ -1,45 +1,96 @@
 import {QueryBuilder} from 'knex';
+import { ICacheService } from '../../../cache';
 import {DataClient} from '../../../data/DataProvider';
 
-export interface PersonVehicule {
+export interface PersonsVehicule {
+  id: string
   title: string,
   description: string,
   release_date?: string,
-  PersonVehicule_id: string
+  PersonsVehiculeVehicule_id: string
 }
 
-export const getPersonVehicule = (users: () => QueryBuilder) => async (id: string) => {
-  return (await users().select().where({id}) as PersonVehicule[])[0]
-} 
+export const getPersonsVehicule = (users: () => QueryBuilder, cache: ICacheService) => 
+  async (id: string) => {
+    return cache
+      .get(id)
+      .resolve(async() =>
+          (await users().select().where({id}))[0] as PersonsVehicule
+      )
+  } 
 
-export const createPersonVehicule = (users: () => QueryBuilder) => async (input?: PersonVehicule) => {
-  const result = (await users().insert(input, ['id']) as [{id: string}])[0]
+export const createPersonsVehicule = (users: () => QueryBuilder, cache: ICacheService) => 
+  async (input?: PersonsVehicule) => {
+    const result = (await users().insert(input, ['id']))[0] as number;
+    const [row] = await users().select().where({id: result});
+    return cache.set(
+      result,
+      row
+    );
+  }
 
-  return (await users().select().where({id: result.id}) as PersonVehicule[])[0]
+
+export const updatePersonsVehicule = (users: () => QueryBuilder, cache: ICacheService) => 
+  async (input: PersonsVehicule) => {
+    const {id, ...rest} = input;
+    await users().where({id}).update(rest);
+
+    return await cache.set(
+      id,
+      await users().select().where({id})
+    );
+  }
+
+export const deletePersonsVehicule = (users: () => QueryBuilder, cache: ICacheService) => 
+  async (id : number) => {
+    await users()
+      .where({id})
+      .delete()
+      .then(() => cache.remove(id)); 
+  }
+
+interface PersonsVehiculeQueryParameters {
+  offset: number | null,
+  limit: number | null
 }
 
-export interface GetListInput extends Omit<PersonVehicule, 'id'> {}
+export const getPersonsVehiculeList = (personsvehicules: () => QueryBuilder, cache: ICacheService) => 
+  async (parameters: PersonsVehiculeQueryParameters) => {
+    let query = personsvehicules().select();
+    
+    if(parameters.offset)
+      query = query.where("id", ">", parameters.offset);
+    
+    if(parameters.limit)
+      query = query.limit(parameters.limit);
 
-export const getPersonVehiculeList = (users: () => QueryBuilder) => async (input?: GetListInput) => {
-  const query = users().select()
-  if (input) query.where(input)
+    const result = await query as PersonsVehicule[]
+    
+    cache.storeBulk(result, (obj) => obj.id);
 
-  return (await query as PersonVehicule[])
-}
+    return result;
+  }
 
  
 export interface Data {
-  get: ReturnType<typeof getPersonVehicule>,
-  getList: ReturnType<typeof getPersonVehiculeList>,
-  create: ReturnType<typeof createPersonVehicule>
+  get: ReturnType<typeof getPersonsVehicule>,
+  getList: ReturnType<typeof getPersonsVehiculeList>,
+  create: ReturnType<typeof createPersonsVehicule>,
+  update: ReturnType<typeof updatePersonsVehicule>
+  delete: ReturnType<typeof deletePersonsVehicule>
 }
 
-export async function create (data: DataClient): Promise<Data> {
-  const users = () => data.mysql.table('User')
+export async function create (
+  data: DataClient,
+  cache: ICacheService
+): Promise<Data> {
+  const users = () => data.mysql.table('personsvehicule')
 
   return {
-    get: getPersonVehicule(users),
-    getList: getPersonVehiculeList(users),
-    create: createPersonVehicule(users),
+    get: getPersonsVehicule(users, cache),
+    getList: getPersonsVehiculeList(users, cache),
+    create: createPersonsVehicule(users, cache),
+    update: updatePersonsVehicule(users, cache),
+    delete: deletePersonsVehicule(users, cache)
   }
 }
