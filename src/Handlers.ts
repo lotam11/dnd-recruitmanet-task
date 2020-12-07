@@ -23,9 +23,9 @@ export async function create (
         )
       )
     )),
-    filmsHandler: (await FilmsHandler.create(data)),
-    starshipHandler: (await StarshipHandler.create(data)),
-    vehiculeHandler: (await VehiculeHandler.create(data)),
+    // filmsHandler: (await FilmsHandler.create(data)),
+    // starshipHandler: (await StarshipHandler.create(data)),
+    // vehiculeHandler: (await VehiculeHandler.create(data)),
     userHandler: (await UserHandler.create(data, auth)),
   }
 };
