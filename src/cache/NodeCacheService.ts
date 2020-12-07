@@ -3,21 +3,16 @@ import NodeCache from "node-cache"
 import { ICacheService, Resolver, CacheGetInterface } from ".";
 
 export const set = (cache: NodeCache) =>
-  <T>(
-    id: any,
-    data: T
-  ): T => {
+  <T>(id: any, data: T): T => {
     cache.set(id, data);
     return data;
   }
 
 export const get = (cache: NodeCache) =>
-  <T>(
-    id: any
-  ): CacheGetInterface<T> => {
+  <T>(id: any): CacheGetInterface<T> => {
     const value = cache.get(id) as T;
-
-    if ( value !== undefined ) 
+    console.log(value);
+    if ( value === undefined ) 
       return {
         resolve: async (resolve: Resolver<T>): Promise<T> => {
           const result = await resolve();
@@ -39,8 +34,10 @@ export const remove = (cache: NodeCache) =>
 
 export const storeBulk = (cache: NodeCache) =>
   <T>(array: Array<T>, resolveKey: (obj: T) => any) => {
-    const bulk: Array<any> = array.map((val:T) => {key: resolveKey(val), val} );
-    
+    const bulk: Array<any> = array.map((val:T) => ({
+      key: resolveKey(val),
+      val
+    }));
     cache.mset(bulk);
   }
 

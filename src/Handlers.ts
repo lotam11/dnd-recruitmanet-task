@@ -5,7 +5,7 @@ import * as PersonData from "./app/persons/PersonData";
 import FilmsHandler from "./app/persons/films/FilmsHandler";
 import StarshipHandler from "./app/persons/starships/StarshipHandler";
 import VehiculeHandler from "./app/persons/vehicule/VehiculeHandler";
-import * as NodeCacheService from "./cache/NodeCahceService"
+import * as NodeCacheService from "./cache/NodeCacheService"
 import UserHandler from "./app/user/UserController"
 import { Server } from "./Config";
 import { IAuthService } from "./auth";
@@ -19,9 +19,7 @@ export async function create (
       await PersonService.create(
         await PersonData.create(
           data,
-          NodeCacheService.create({
-            stdTTL: 86400
-          })
+          NodeCacheService.create({stdTTL: 86400})
         )
       )
     )),

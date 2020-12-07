@@ -20,7 +20,7 @@ export const getPerson = (users: () => QueryBuilder, cache: ICacheService) =>
 
 export const createPerson = (users: () => QueryBuilder, cache: ICacheService) => 
   async (input?: Person) => {
-    const result = (await users().insert(input, ['id'])) as number;
+    const result = (await users().insert(input, ['id']))[0] as number;
     const [row] = await users().select().where({id: result});
     return cache.set(
       result,

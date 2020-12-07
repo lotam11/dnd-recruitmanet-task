@@ -43,7 +43,7 @@ const Middleware_1 = require("./Middleware");
 const Config_1 = require("./Config");
 const Handlers = __importStar(require("./Handlers"));
 const Routes_1 = require("./Routes");
-const JwtAuth = __importStar(require("./user/auth/JWTAuthService"));
+const JwtAuth = __importStar(require("./auth/JWTAuthService"));
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 function create() {
     return __awaiter(this, void 0, void 0, function* () {
