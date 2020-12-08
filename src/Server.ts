@@ -8,7 +8,7 @@ import jwt from 'express-jwt'
 
 import PersonHandler from './app/persons/PersonController'
 import DataProvider, { DataClient } from './data/DataProvider'
-import {handleValidatorErrors, promise, wrapAsync} from './Middleware'
+import {handleValidatorErrors} from './Middleware'
 import {Server} from './Config'
 import * as Handlers from './Handlers'
 import { createRouter } from './Routes';
@@ -32,7 +32,10 @@ export async function create () {
     .post("/authorize", asyncHandler(handlers.userHandler.authenticate))
     .post("/register", asyncHandler(handlers.userHandler.register))
     .use(
-      appRouter.use(jwt({ secret: process.env.JWT_SECRET_KEY as string, algorithms: ['HS256']}))
+      appRouter.use(jwt({
+        secret: process.env.JWT_SECRET_KEY as string,
+        algorithms: ['HS256']
+      }))
     );
   app.use(handleValidatorErrors);
   return app;

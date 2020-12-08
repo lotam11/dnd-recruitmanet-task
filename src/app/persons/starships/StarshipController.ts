@@ -15,9 +15,16 @@ export const createStarship = (starships: StarshipService) => {
   });
 
   return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+    
     Joi.attempt(req.body, validation);
 
-    const starship = await starships.create(req.body)
+    const starship = await starships.create(req.body, person_id)
     
     res.json(starship).end();
   }
@@ -33,31 +40,55 @@ export const updateStarship = (starships: StarshipService) => {
   });
 
   return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+
     const input = {...req.body, id: req.params.id}
 
     Joi.attempt(input, validation);
 
-    const starship = await starships.update(input)
+    const starship = await starships.update(input, parseInt(person_id));
     
     res.json(starship).end();
   }
 }
 
 export function getStarship(starships: StarshipService){
-  return async (req: Request, res: Response) =>
+  return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+
     res.json(
-      await starships.get(req.params.id)
+      await starships.get(req.params.id, parseInt(person_id))
     ).end();
+  }
 }
 
 export function getStarshipList(starships: StarshipService) {
-  return async (req: Request, res: Response) =>
+  return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+
     res.json(
       await starships.getList({
         offset: parseInt(req.query.query as string),
-        limit: parseInt(req.query.limit as string)
+        limit: parseInt(req.query.limit as string),
+        person_id: parseInt(person_id),
       })
     ).end();
+  }
 }
 
 export function deleteStarship(starships: StarshipService) {

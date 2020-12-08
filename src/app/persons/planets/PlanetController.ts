@@ -19,9 +19,16 @@ export const createPlanet = (planets: PlanetService) => {
   });
 
   return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+
     Joi.attempt(req.body, validation);
 
-    const planet = await planets.create(req.body)
+    const planet = await planets.create(req.body, person_id)
     
     res.json(planet).end();
   }
@@ -41,31 +48,54 @@ export const updatePlanet = (planets: PlanetService) => {
   });
 
   return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+
     const input = {...req.body, id: req.params.id}
 
     Joi.attempt(input, validation);
 
-    const planet = await planets.update(input)
+    const planet = await planets.update(input, parseInt(person_id))
     
     res.json(planet).end();
   }
 }
 
 export function getPlanet(planets: PlanetService){
-  return async (req: Request, res: Response) =>
+  return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+ 
     res.json(
-      await planets.get(req.params.id)
+      await planets.get(parseInt(req.params.id), parseInt(person_id))
     ).end();
+  }
 }
 
 export function getPlanetList(planets: PlanetService) {
-  return async (req: Request, res: Response) =>
+  return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+
     res.json(
       await planets.getList({
         offset: parseInt(req.query.query as string),
         limit: parseInt(req.query.limit as string)
-      })
+      },parseInt(person_id))
     ).end();
+  }
 }
 
 export function deletePlanet(planets: PlanetService) {

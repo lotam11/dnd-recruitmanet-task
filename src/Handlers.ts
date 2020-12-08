@@ -6,18 +6,24 @@ import FilmsHandler from "./app/persons/films/FilmsController";
 import StarshipHandler from "./app/persons/starships/StarshipController";
 import VehiculeHandler from "./app/persons/vehicule/VehiculeController";
 import * as NodeCacheService from "./cache/NodeCacheService"
-import UserHandler from "./app/user/UserController"
+import UserController from "./app/user/UserController"
 import { Server } from "./Config";
 import { IAuthService } from "./auth";
+import StarshipService from "./app/persons/starships/StarshipService";
+import * as StarshipData from "./app/persons/starships/StarshipData";
+import * as VehiculeData from "./app/persons/vehicule/VehiculeData"
+import * as VehiculeService from "./app/persons/vehicule/VehiculeService"
 
 export async function create (
   data: DataClient,
   auth: IAuthService
 ){
+  let personData;
+  
   return {
     personHandler: (await PersonController.create(
       await PersonService.create(
-        await PersonData.create(
+        personData = await PersonData.create(
           data,
           NodeCacheService.create({stdTTL: 86400})
         )
@@ -25,8 +31,27 @@ export async function create (
     )),
     // filmsHandler: (await FilmsHandler.create(data)),
     // starshipHandler: (await StarshipHandler.create(data)),
-    // vehiculeHandler: (await VehiculeHandler.create(data)),
-    userHandler: (await UserHandler.create(data, auth)),
+    starshipHandler: (await StarshipHandler.create(
+      await StarshipService.create(
+        await StarshipData.create(
+          data,
+          personData,
+          NodeCacheService.create({stdTTL: 86400}),
+        )
+      )
+    )),
+
+    vehiculeHandler: (await VehiculeHandler.create(
+      await VehiculeService.create(
+        await VehiculeData.create(
+          data,
+          personData,
+          NodeCacheService.create({stdTTL: 86400}),
+        )
+      )
+    )),
+
+    userHandler: (await UserController.create(data, auth)),
   }
 };
 

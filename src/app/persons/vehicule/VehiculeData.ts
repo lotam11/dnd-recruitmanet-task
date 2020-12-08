@@ -1,28 +1,43 @@
 import {QueryBuilder} from 'knex';
 import { ICacheService } from '../../../cache';
 import {DataClient} from '../../../data/DataProvider';
+import {Data as PersonData} from "../PersonData";
 
 export interface PersonsVehicule {
   id: string
   name: string,
   description: string,
   year_of_production?: string,
-  speed?: string
+  speed?: string,
+  person_id?: number 
 }
 
-export const getPersonsVehicule = (users: () => QueryBuilder, cache: ICacheService) => 
-  async (id: string) => {
-    return cache
+export const getPersonsVehicule = (vehicule: () => QueryBuilder, cache: ICacheService) => 
+  async (id: string, person_id: number) => {
+    const result = await cache
       .get(id)
-      .resolve(async() =>
-          (await users().select().where({id}))[0] as PersonsVehicule
+      .resolve(async(): Promise<PersonsVehicule> =>
+          (await vehicule().select().where({id}))[0] as PersonsVehicule
       )
+    return (result.person_id == person_id)? result: null
+
   } 
 
-export const createPersonsVehicule = (users: () => QueryBuilder, cache: ICacheService) => 
-  async (input?: PersonsVehicule) => {
-    const result = (await users().insert(input, ['id']))[0] as number;
-    const [row] = await users().select().where({id: result});
+export const createPersonsVehicule = (
+  vehicule: () => QueryBuilder,
+  perosns: PersonData,
+  cache: ICacheService
+) =>  
+  async (
+    person_id: string,
+    input: PersonsVehicule
+  ) => {
+    if(!! perosns.get(person_id))
+      return;
+
+    const result = (await vehicule().insert(input, ['id']))[0] as number;
+    const [row] = await vehicule().select().where({id: result});
+    
     return cache.set(
       result,
       row
@@ -30,20 +45,28 @@ export const createPersonsVehicule = (users: () => QueryBuilder, cache: ICacheSe
   }
 
 
-export const updatePersonsVehicule = (users: () => QueryBuilder, cache: ICacheService) => 
-  async (input: PersonsVehicule) => {
+
+export const updatePersonsVehicule = (vehicule: () => QueryBuilder, cache: ICacheService) => {
+  const getVehicule = getPersonsVehicule(vehicule, cache);
+
+  return async (input: PersonsVehicule, person_id: number) => {
     const {id, ...rest} = input;
-    await users().where({id}).update(rest);
+
+    if( !! await getVehicule(id, person_id) )
+      return null;
+
+    await vehicule().where({id}).update(rest);
 
     return await cache.set(
       id,
-      await users().select().where({id})
+      await vehicule().select().where({id})
     );
   }
+}
 
-export const deletePersonsVehicule = (users: () => QueryBuilder, cache: ICacheService) => 
+export const deletePersonsVehicule = (vehicule: () => QueryBuilder, cache: ICacheService) => 
   async (id : number) => {
-    await users()
+    await vehicule()
       .where({id})
       .delete()
       .then(() => cache.remove(id)); 
@@ -51,12 +74,18 @@ export const deletePersonsVehicule = (users: () => QueryBuilder, cache: ICacheSe
 
 interface PersonsVehiculeQueryParameters {
   offset: number | null,
-  limit: number | null
+  limit: number | null,
+  person_id: string
 }
 
-export const getPersonsVehiculeList = (personsvehicules: () => QueryBuilder, cache: ICacheService) => 
+export const getPersonsVehiculeList = (
+  vehicules: () => QueryBuilder,
+  cache: ICacheService
+) => 
   async (parameters: PersonsVehiculeQueryParameters) => {
-    let query = personsvehicules().select();
+    let query = vehicules()
+      .select()
+      .where("person_id", "=", parameters.person_id);
     
     if(parameters.offset)
       query = query.where("id", ">", parameters.offset);
@@ -82,15 +111,16 @@ export interface Data {
 
 export async function create (
   data: DataClient,
+  persons: PersonData,
   cache: ICacheService
 ): Promise<Data> {
-  const users = () => data.mysql.table('personsvehicule')
+  const vehicule = () => data.mysql.table('person_vehicules')
 
   return {
-    get: getPersonsVehicule(users, cache),
-    getList: getPersonsVehiculeList(users, cache),
-    create: createPersonsVehicule(users, cache),
-    update: updatePersonsVehicule(users, cache),
-    delete: deletePersonsVehicule(users, cache)
+    get: getPersonsVehicule(vehicule, cache),
+    getList: getPersonsVehiculeList(vehicule, cache),
+    create: createPersonsVehicule(vehicule, persons, cache),
+    update: updatePersonsVehicule(vehicule, cache),
+    delete: deletePersonsVehicule(vehicule, cache)
   }
 }

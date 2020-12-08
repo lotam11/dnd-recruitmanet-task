@@ -1,28 +1,42 @@
 import {QueryBuilder} from 'knex';
 import { ICacheService } from '../../../cache';
 import {DataClient} from '../../../data/DataProvider';
+import {Data as PersonData} from "../PersonData";
 
 export interface PersonStarship {
   id: string
   name: string,
   description: string,
   year_of_production?: string,
-  speed?: string
+  speed?: string,
+  person_id: number
 }
 
-export const getPersonStarship = (starships: () => QueryBuilder, cache: ICacheService) => 
-  async (id: string) => {
-    return cache
+export const getPersonStarship = (
+  starships: () => QueryBuilder,
+  cache: ICacheService
+) => 
+  async (id: string, person_id: number ) => {
+    const result = await cache
       .get(id)
-      .resolve(async() =>
-          (await starships().select().where({id}))[0] as PersonStarship
-      )
+      .resolve(async(): Promise<PersonStarship> =>
+          (await starships().select().where({id}))[0]
+      );
+    return (result.person_id == person_id)? result: null
   } 
 
-export const createPersonStarship = (starships: () => QueryBuilder, cache: ICacheService) => 
-  async (input?: PersonStarship) => {
+export const createPersonStarship = (
+  starships: () => QueryBuilder,
+  cache: ICacheService,
+  perosns: PersonData,
+) => 
+  async (input: PersonStarship, person_id: string) => {
+    if(!! perosns.get(person_id))
+      return;
+
     const result = (await starships().insert(input, ['id']))[0] as number;
     const [row] = await starships().select().where({id: result});
+    
     return cache.set(
       result,
       row
@@ -30,9 +44,21 @@ export const createPersonStarship = (starships: () => QueryBuilder, cache: ICach
   }
 
 
-export const updatePersonStarship = (starships: () => QueryBuilder, cache: ICacheService) => 
-  async (input: PersonStarship) => {
+export const updatePersonStarship = (
+  starships: () => QueryBuilder,
+  cache: ICacheService,
+) => {
+  const getStarship = getPersonStarship(starships, cache);
+
+  return async (
+    input: PersonStarship,
+    person_id: number
+  ) => {
     const {id, ...rest} = input;
+    
+    if( !! await getStarship(id, person_id) )
+      return null;
+
     await starships().where({id}).update(rest);
 
     return await cache.set(
@@ -40,8 +66,11 @@ export const updatePersonStarship = (starships: () => QueryBuilder, cache: ICach
       await starships().select().where({id})
     );
   }
-
-export const deletePersonStarship = (starships: () => QueryBuilder, cache: ICacheService) => 
+}
+export const deletePersonStarship = (
+  starships: () => QueryBuilder,
+  cache: ICacheService
+) => 
   async (id : number) => {
     await starships()
       .where({id})
@@ -50,16 +79,22 @@ export const deletePersonStarship = (starships: () => QueryBuilder, cache: ICach
   }
 
 interface PersonStarshipQueryParameters {
-  offset: number | null,
-  limit: number | null
+  offset: number,
+  limit: number,
+  person_id: number
 }
 
-export const getPersonStarshipList = (personstarships: () => QueryBuilder, cache: ICacheService) => 
+export const getPersonStarshipList = (
+  starships: () => QueryBuilder,
+  cache: ICacheService
+) => 
   async (parameters: PersonStarshipQueryParameters) => {
-    let query = personstarships().select();
+    let query = starships()
+      .select()
+      .where("person_id", "=", parameters.person_id);
     
     if(parameters.offset)
-      query = query.where("id", ">", parameters.offset);
+      query = query.offset(parameters.offset);
     
     if(parameters.limit)
       query = query.limit(parameters.limit);
@@ -82,14 +117,17 @@ export interface Data {
 
 export async function create (
   data: DataClient,
+  personData: PersonData,
   cache: ICacheService
 ): Promise<Data> {
-  const starships = () => data.mysql.table('personstarship')
+  const starships = () => data.mysql.table('person_starship');
+  const persons = () => data.mysql.table('persons')
+
 
   return {
     get: getPersonStarship(starships, cache),
     getList: getPersonStarshipList(starships, cache),
-    create: createPersonStarship(starships, cache),
+    create: createPersonStarship(starships, cache, personData),
     update: updatePersonStarship(starships, cache),
     delete: deletePersonStarship(starships, cache)
   }

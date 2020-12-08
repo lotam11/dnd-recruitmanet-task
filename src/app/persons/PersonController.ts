@@ -1,8 +1,6 @@
 import {Request, Response} from 'express'
 import Joi from 'joi'
 
-import {DataClient} from '../../data/DataProvider'
-import { Person } from './PersonData'
 import {Service as PersonService} from './PersonService'
 
 
@@ -68,8 +66,8 @@ export function deletePerson(persons: PersonService) {
     const id = parseInt(req.params.id);
 
     await persons.delete(id);
-    res.status(200).end()
 
+    res.status(200).end()
   }
 }
 

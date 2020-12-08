@@ -11,9 +11,9 @@ export const authenticate = () =>
     )
 
 export const getKey = (secretKey: string, expiresIn: number) => 
-    async(data: Object) => { 
-      return jwt.sign(data, secretKey, {expiresIn})
-    };
+  async(data: Object) => { 
+    return jwt.sign(data, secretKey, {expiresIn})
+  };
 
 
 interface JWTAuthServiceConfiguation {

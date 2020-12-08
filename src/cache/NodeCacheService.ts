@@ -9,12 +9,12 @@ export const set = (cache: NodeCache) =>
   }
 
 export const get = (cache: NodeCache) =>
-  <T>(id: any): CacheGetInterface<T> => {
-    const value = cache.get(id) as T;
-    console.log(value);
+  (id: any): CacheGetInterface => {
+    const value = cache.get(id);
+
     if ( value === undefined ) 
       return {
-        resolve: async (resolve: Resolver<T>): Promise<T> => {
+        resolve: async <T>(resolve: Resolver<T>): Promise<T> => {
           const result = await resolve();
           cache.set(id, result);
           return result
@@ -22,8 +22,8 @@ export const get = (cache: NodeCache) =>
       }
     
     return {
-      resolve: async (resolve: Resolver<T>): Promise<T> =>
-        value
+      resolve: async <T>(resolve: Resolver<T>): Promise<T> =>
+        value as T
     }
   }
 
@@ -34,7 +34,7 @@ export const remove = (cache: NodeCache) =>
 
 export const storeBulk = (cache: NodeCache) =>
   <T>(array: Array<T>, resolveKey: (obj: T) => any) => {
-    const bulk: Array<any> = array.map((val:T) => ({
+    const bulk: Array<any> = array.map((val: T) => ({
       key: resolveKey(val),
       val
     }));
