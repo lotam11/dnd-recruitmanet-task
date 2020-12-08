@@ -25,5 +25,6 @@ export async function createRouter(
 ): Promise<Router>{
   return Router()
     .use("/persons", personsRouter(handlers))
+    .use("/starships", starshipRouter(handlers))
     
 }
