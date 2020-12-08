@@ -43,7 +43,7 @@ export const updateStarship = (starships: StarshipService) => {
     const {person_id} = req.params;
 
     if( isNaN(+person_id) ){
-      res.status(404).end();
+      res.status(400).end();
       return;
     }
 
@@ -62,7 +62,7 @@ export function getStarship(starships: StarshipService){
     const {person_id} = req.params;
 
     if( isNaN(+person_id) ){
-      res.status(404).end();
+      res.status(400).end();
       return;
     }
 
@@ -77,7 +77,7 @@ export function getStarshipList(starships: StarshipService) {
     const {person_id} = req.params;
 
     if( isNaN(+person_id) ){
-      res.status(404).end();
+      res.status(400).end();
       return;
     }
 

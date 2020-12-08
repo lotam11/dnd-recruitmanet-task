@@ -13,13 +13,18 @@ import StarshipService from "./app/persons/starships/StarshipService";
 import * as StarshipData from "./app/persons/starships/StarshipData";
 import * as VehiculeData from "./app/persons/vehicule/VehiculeData"
 import * as VehiculeService from "./app/persons/vehicule/VehiculeService"
+import * as PlanetController from "./app/persons/planets/PlanetController";
+import * as PlanetData from "./app/persons/planets/PlanetData";
+import * as PlanetService from "./app/persons/planets/PlanetService";
+
+
 
 export async function create (
   data: DataClient,
   auth: IAuthService
 ){
   let personData;
-  
+
   return {
     personHandler: (await PersonController.create(
       await PersonService.create(
@@ -30,10 +35,19 @@ export async function create (
       )
     )),
     // filmsHandler: (await FilmsHandler.create(data)),
-    // starshipHandler: (await StarshipHandler.create(data)),
     starshipHandler: (await StarshipHandler.create(
       await StarshipService.create(
         await StarshipData.create(
+          data,
+          personData,
+          NodeCacheService.create({stdTTL: 86400}),
+        )
+      )
+    )),
+
+    planetHandler: (await PlanetController.create(
+      await PlanetService.create(
+        await PlanetData.create(
           data,
           personData,
           NodeCacheService.create({stdTTL: 86400}),
