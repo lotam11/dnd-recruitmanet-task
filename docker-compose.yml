@@ -22,7 +22,7 @@ services:
       - db
 
     ports:
-      - "8000"
+      - "8000:8000"
     entrypoint: /usr/app/docker_start.sh
     env_file: ./.env
     environment:

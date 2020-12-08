@@ -15,9 +15,9 @@ export const createFilm = (films: FilmService) => {
   });
 
   return async (req: Request, res: Response) => {
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -39,10 +39,9 @@ export const updateFilm = (films: FilmService) => {
   });
 
   return async (req: Request, res: Response) => {
+    const {person_id} = req.context;
 
-    const {person_id} = req.params;
-
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -59,9 +58,9 @@ export const updateFilm = (films: FilmService) => {
 
 export function getFilm(films: FilmService){
   return async (req: Request, res: Response) => {
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -74,9 +73,9 @@ export function getFilm(films: FilmService){
 
 export function getFilmList(films: FilmService) {
   return async (req: Request, res: Response) => {
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -93,9 +92,11 @@ export function getFilmList(films: FilmService) {
 
 export function deleteFilm(films: FilmService) {
   return async (req: Request, res:Response) => {
-    if(isNaN(+req.params.id)){
-      res.status(400).json({error: "id must be a number"}).end();
-      return
+    const {person_id} = req.context;
+
+    if( !person_id || isNaN(+person_id) ){
+      res.status(404).end();
+      return;
     }
 
     const id = parseInt(req.params.id);

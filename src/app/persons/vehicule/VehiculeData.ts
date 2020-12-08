@@ -32,12 +32,13 @@ export const createPersonsVehicule = (
     person_id: string,
     input: PersonsVehicule
   ) => {
-    if(!! perosns.get(person_id))
+    
+    if(! await perosns.get(person_id))
       return;
 
-    const result = (await vehicule().insert(input, ['id']))[0] as number;
+    const result = (await vehicule().insert({person_id, ...input}, ['id']))[0] as number;
     const [row] = await vehicule().select().where({id: result});
-    
+
     return cache.set(
       result,
       row
@@ -114,7 +115,7 @@ export async function create (
   persons: PersonData,
   cache: ICacheService
 ): Promise<Data> {
-  const vehicule = () => data.mysql.table('person_vehicules')
+  const vehicule = () => data.mysql.table('person_vehicles')
 
   return {
     get: getPersonsVehicule(vehicule, cache),

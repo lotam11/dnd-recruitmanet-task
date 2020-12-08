@@ -5,7 +5,7 @@ import {Service as VehiculeService} from './VehiculeService'
 
 export const createVehicule = (vehicules: VehiculeService) => { 
   const validation = Joi.object().keys({ 
-    name: Joi.number().required(),
+    name: Joi.string().required(),
     year_of_production: Joi.string().required(),
     description: Joi.string().required(),
     speed: Joi.number().required(), 
@@ -14,14 +14,14 @@ export const createVehicule = (vehicules: VehiculeService) => {
   return async (req: Request, res: Response) => {
     Joi.attempt(req.body, validation);
 
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
 
-    const vehicule = await vehicules.create(person_id, req.body)
+    const vehicule = await vehicules.create(person_id as string, req.body)
     
     res.json(vehicule).end();
   }
@@ -38,9 +38,9 @@ export const updateVehicule = (vehicules: VehiculeService) => {
 
   return async (req: Request, res: Response) => {
 
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -57,9 +57,9 @@ export const updateVehicule = (vehicules: VehiculeService) => {
 
 export function getVehicule(vehicules: VehiculeService){
   return async (req: Request, res: Response) => {
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -72,9 +72,9 @@ export function getVehicule(vehicules: VehiculeService){
 
 export function getVehiculeList(vehicules: VehiculeService) {
   return async (req: Request, res: Response) => {
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -91,9 +91,14 @@ export function getVehiculeList(vehicules: VehiculeService) {
 
 export function deleteVehicule(vehicules: VehiculeService) {
   return async (req: Request, res:Response) => {
-    if(isNaN(+req.params.id)){
-      res.status(400).json({error: "id must be a number"}).end();
-      return
+    const {person_id} = req.context;
+
+    if( !person_id || 
+        isNaN(+person_id) ||
+        !!await vehicules.get(req.params.id, parseInt(person_id))
+    ){
+      res.status(404).end();
+      return;
     }
 
     const id = parseInt(req.params.id);

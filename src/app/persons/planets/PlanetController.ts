@@ -19,9 +19,9 @@ export const createPlanet = (planets: PlanetService) => {
   });
 
   return async (req: Request, res: Response) => {
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -48,9 +48,9 @@ export const updatePlanet = (planets: PlanetService) => {
   });
 
   return async (req: Request, res: Response) => {
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -67,9 +67,9 @@ export const updatePlanet = (planets: PlanetService) => {
 
 export function getPlanet(planets: PlanetService){
   return async (req: Request, res: Response) => {
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -82,9 +82,9 @@ export function getPlanet(planets: PlanetService){
 
 export function getPlanetList(planets: PlanetService) {
   return async (req: Request, res: Response) => {
-    const {person_id} = req.params;
+    const {person_id} = req.context;
 
-    if( isNaN(+person_id) ){
+    if( !person_id || isNaN(+person_id) ){
       res.status(404).end();
       return;
     }
@@ -100,9 +100,11 @@ export function getPlanetList(planets: PlanetService) {
 
 export function deletePlanet(planets: PlanetService) {
   return async (req: Request, res:Response) => {
-    if(isNaN(+req.params.id)){
-      res.status(400).json({error: "id must be a number"}).end();
-      return
+    const {person_id} = req.context;
+
+    if( !person_id || isNaN(+person_id) ){
+      res.status(404).end();
+      return;
     }
 
     const id = parseInt(req.params.id);
