@@ -16,7 +16,7 @@ export const getPersonStarship = (
   starships: () => QueryBuilder,
   cache: ICacheService
 ) => 
-  async (id: string, person_id: number ) => {
+  async (id: string, person_id: number) => {
     const result = await cache
       .get(id)
       .resolve(async(): Promise<PersonStarship> =>

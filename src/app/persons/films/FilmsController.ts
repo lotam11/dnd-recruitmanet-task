@@ -15,9 +15,16 @@ export const createFilm = (films: FilmService) => {
   });
 
   return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+
     Joi.attempt(req.body, validation);
 
-    const film = await films.create(req.body)
+    const film = await films.create(req.body, person_id)
     
     res.json(film).end();
   }
@@ -32,31 +39,56 @@ export const updateFilm = (films: FilmService) => {
   });
 
   return async (req: Request, res: Response) => {
+
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+
     const input = {...req.body, id: req.params.id}
 
     Joi.attempt(input, validation);
 
-    const film = await films.update(input)
+    const film = await films.update(input, parseInt(person_id));
     
     res.json(film).end();
   }
 }
 
 export function getFilm(films: FilmService){
-  return async (req: Request, res: Response) =>
+  return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+
     res.json(
-      await films.get(req.params.id)
+      await films.get(parseInt(req.params.id), parseInt(person_id))
     ).end();
+  }
 }
 
 export function getFilmList(films: FilmService) {
-  return async (req: Request, res: Response) =>
+  return async (req: Request, res: Response) => {
+    const {person_id} = req.params;
+
+    if( isNaN(+person_id) ){
+      res.status(404).end();
+      return;
+    }
+
     res.json(
       await films.getList({
         offset: parseInt(req.query.query as string),
-        limit: parseInt(req.query.limit as string)
+        limit: parseInt(req.query.limit as string),
+        person_id: parseInt(person_id)
       })
     ).end();
+  }
 }
 
 export function deleteFilm(films: FilmService) {

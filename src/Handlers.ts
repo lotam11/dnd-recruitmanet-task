@@ -16,7 +16,9 @@ import * as VehiculeService from "./app/persons/vehicule/VehiculeService"
 import * as PlanetController from "./app/persons/planets/PlanetController";
 import * as PlanetData from "./app/persons/planets/PlanetData";
 import * as PlanetService from "./app/persons/planets/PlanetService";
-
+import * as FilmsController from "./app/persons/films/FilmsController";
+import * as FilmsData from "./app/persons/films/FilmsData";
+import * as FilmsService from "./app/persons/films/FilmsService";
 
 
 export async function create (
@@ -34,7 +36,15 @@ export async function create (
         )
       )
     )),
-    // filmsHandler: (await FilmsHandler.create(data)),
+    filmHandler: (await FilmsController.create(
+      await FilmsService.create(
+        await FilmsData.create(
+          data,
+          personData,
+          NodeCacheService.create({stdTTL: 86400})
+        )
+      )
+    )),
     starshipHandler: (await StarshipHandler.create(
       await StarshipService.create(
         await StarshipData.create(
